@@ -1,0 +1,51 @@
+config:
+  repo_org: solo-io
+  repo_name: sm-marketplace
+  output_directory: _output
+  version_var: github.com/solo-io/sm-marketplace/services/internal/version.Version
+  gcloud:
+    project_id: gloo-ee
+    decrypt_key: build-key
+    decrypt_keyring: build
+    helm_chart_bucket: sm-marketplace-helm
+  container_registries:
+    - base_url: quay.io/solo-io
+      release_only: true
+      quay:
+        encrypted_token: CiQAwdWthifvdUjpVHAln3ZIz4WljWx6qLt8E4yJArmrU4/1HQoSaQD5SXFIeMulT7DxGdwW0L9R+gA0SATR05xpTz7JS9LXJK+4iYPlFvVPs7O3DYee2YPJoF7o44vJ94+AyuMLQucS6BhHXQ0t//GvQWaFvdcTO4qH5HYgGQSrRY0a4E3l+4q6/M4da2m98Q==
+    - gcr: {}
+checks:
+  - solo_kit_generation:
+  - code_generation:
+      entrypoint: make generated-ui
+  - check_format: {}
+  - check_spelling: {}
+manifests:
+  - helm:
+      name: sm-marketplace
+      upload_yaml_to_github: true
+compile:
+  - go_compile:
+    - name: smm-apiserver
+      entry_point: services/apiserver/cmd/main.go
+      platforms: ["linux"]
+      upload_to_github: false
+    - name: smm-operator
+      entry_point: services/operator/cmd/main.go
+      platforms: ["linux"]
+      upload_to_github: false
+  - yarn_compile:
+      directory: ui
+containers:
+  - image_name: smm-operator
+    docker_file: services/operator/cmd/Dockerfile
+  - image_name: smm-apiserver
+    docker_file: services/apiserver/cmd/Dockerfile
+  - image_name: smm-envoy
+    docker_file: envoy/Dockerfile
+  - image_name: smm-ui
+    docker_file: ui/Dockerfile
+test_runs:
+  - args: ['-r']
+    env:
+
