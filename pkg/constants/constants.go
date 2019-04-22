@@ -6,4 +6,7 @@ const (
 	EnvTagVersion = "TAG_VERSION"
 
 	ConfigFileName = "solo-project.yaml"
+
+	PrintEnvTrue  = "1"
+	PrintEnvFalse = ""
 )

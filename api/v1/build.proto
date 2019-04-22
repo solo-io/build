@@ -9,9 +9,19 @@ message BuildRun {
 
 // This contains a few extra things at build time
 message BuildRunConfig {
+    BuildEnvVars build_env_vars = 1;
+    ComputedBuildVars computed_build_vars = 2;
+}
+
+message BuildEnvVars {
     string build_id = 1;
     string commit_sha = 2;
     string tag_version = 3;
+}
+
+message ComputedBuildVars {
+    bool release = 1;
+    string image_tag = 2;
 }
 
 message GcloudConfig {
