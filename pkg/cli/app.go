@@ -131,7 +131,7 @@ func stringForBoolToEnv(b bool) string {
 	return constants.PrintEnvFalse
 }
 
-func getBuildRunConfigFromEnv() v1.BuildRunConfig {
+func getBuildRunConfigFromEnv(spec *v1.BuildSpec) v1.BuildRunConfig {
 	ev := &v1.BuildEnvVars{}
 	ev.BuildId = os.Getenv(constants.EnvBuildId)
 	ev.CommitSha = os.Getenv(constants.EnvCommitSha)
@@ -139,11 +139,23 @@ func getBuildRunConfigFromEnv() v1.BuildRunConfig {
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
 	cv.ImageTag = getImageTag(ev)
-	cv.ContainerPrefix = "TODO-CONTAINER-PREFIX"
+	cv.ContainerPrefix = getContainerPrefix(cv.Release, spec.Config)
 	return v1.BuildRunConfig{
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,
 	}
+}
+
+func getContainerPrefix(isRelease bool, config *v1.BuildConfig) string {
+	targetRegistry := config.ReleaseContainerRegistry
+	if !isRelease && config.TestContainerRegistry != nil {
+		targetRegistry = config.TestContainerRegistry
+	}
+	prefix := ""
+	if err := targetRegistry.GetPrefixFromContainerRegistry(&prefix); err != nil {
+		panic(err)
+	}
+	return prefix
 }
 
 func isRelease(ev *v1.BuildEnvVars) bool {
@@ -175,16 +187,25 @@ func imageTagFromTaggedVersion(tv string) string {
 }
 
 func InitializeBuildRun() v1.BuildRun {
-	buildRunConfig := getBuildRunConfigFromEnv()
-	buildSpec := parseSpec(constants.ConfigFileName)
+	buildSpec := parseSpec()
+	buildRunConfig := getBuildRunConfigFromEnv(buildSpec)
 	return v1.BuildRun{
 		Spec:   buildSpec,
 		Config: &buildRunConfig,
 	}
 }
 
-func parseSpec(filename string) *v1.BuildSpec {
+// uses a config filename from env or default, in that order
+func parseSpec() *v1.BuildSpec {
+	// TODO - also get from flag (as first priority)
+	filename := ""
 	spec := &v1.BuildSpec{}
+	envFile := os.Getenv(constants.EnvVarConfigFileName)
+	if envFile != "" {
+		filename = envFile
+	} else {
+		filename = constants.DefaultConfigFileName
+	}
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)

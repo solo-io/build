@@ -94,12 +94,12 @@ message BuildConfig {
         GcloudConfig gcloud = 10;
     }
 
-    repeated ContainerRegistry container_registries = 20;
+    ContainerRegistry release_container_registry = 20;
+    // optional, if not provided, will use the same registry for release and test
+    ContainerRegistry test_container_registry = 21;
 }
 
 message ContainerRegistry {
-    string base_url = 1;
-    bool release_only = 2;
     oneof registry {
         QuayRegistry quay = 10;
         DockerHubRegistry docker_hub = 11;
@@ -108,7 +108,9 @@ message ContainerRegistry {
 }
 
 message QuayRegistry {
-    string encrypted_token = 1;
+    string base_url = 1;
+    string organization = 2;
+    string encrypted_token = 3;
 }
 
 message DockerHubRegistry {
@@ -116,6 +118,8 @@ message DockerHubRegistry {
 }
 
 message GoogleContainerRegistry {
+    string base_url = 1;
+    string project_name = 2;
 }
 
 message TestRun {

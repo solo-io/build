@@ -5,7 +5,8 @@ const (
 	EnvCommitSha  = "COMMIT_SHA"
 	EnvTagVersion = "TAG_VERSION"
 
-	ConfigFileName = "solo-project.yaml"
+	EnvVarConfigFileName  = "SOLOBUILD_CONFIG_FILE"
+	DefaultConfigFileName = "solo-project.yaml"
 
 	PrintEnvTrue  = "1"
 	PrintEnvFalse = ""
