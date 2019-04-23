@@ -38,9 +38,6 @@ func App(ctx context.Context, version string) *cobra.Command {
 		"build_id", config.BuildId,
 		"commit_sha", config.CommitSha,
 		"tag_version", config.TagVersion)
-	fmt.Println(o)
-	fmt.Println(o.BuildRun)
-	fmt.Println(o.BuildRun.Spec)
 	app := &cobra.Command{
 		Use:     "build",
 		Short:   "CLI for solo.io's build tool",
@@ -53,6 +50,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 	app.AddCommand(
 		o.parseBuildEnvArgs(),
 	)
+	app.PersistentFlags().BoolVar(&o.Input.Debug, "debug", false, "enable verbose debug output")
 	return app
 }
 
@@ -62,15 +60,29 @@ func (o *Options) parseBuildEnvArgs() *cobra.Command {
 		Short: "read environment variables and return corresponding build values",
 	}
 	cmd.AddCommand(
-		o.computeRelease())
+		o.reportRelease(),
+		o.reportImageTag())
 	return cmd
 }
-func (o *Options) computeRelease() *cobra.Command {
+
+func (o *Options) reportRelease() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "release",
 		Short: "reports if a build is a release build",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println(stringForBoolToEnv(o.BuildRun.Config.ComputedBuildVars.Release))
+			return nil
+		},
+	}
+	return cmd
+}
+
+func (o *Options) reportImageTag() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "image-tag",
+		Short: "reports the image tag to use for this build",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println(o.BuildRun.Config.ComputedBuildVars.ImageTag)
 			return nil
 		},
 	}
@@ -107,9 +119,19 @@ func isRelease(ev *v1.BuildEnvVars) bool {
 
 func getImageTag(ev *v1.BuildEnvVars) string {
 	if isRelease(ev) {
-		return ev.TagVersion
+		return imageTagFromTaggedVersion(ev.TagVersion)
 	}
 	return ev.BuildId
+}
+
+func imageTagFromTaggedVersion(tv string) string {
+	if len(tv) < 2 {
+		panic("must have at least two characters in TaggedVersion")
+	}
+	if tv[0] != 'v' {
+		panic(fmt.Sprintf("invalid tagged version: %v, must start with 'v'", tv))
+	}
+	return tv[1:]
 }
 
 func InitializeBuildRun() v1.BuildRun {
