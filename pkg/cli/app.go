@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/solo-io/go-utils/clicore"
+	"k8s.io/helm/pkg/version"
+
 	"github.com/solo-io/go-utils/contextutils"
 
 	"github.com/solo-io/go-utils/protoutils"
@@ -28,6 +31,19 @@ type Input struct {
 	Debug bool
 }
 
+var AppConfig = clicore.CommandConfig{
+	Command:             App,
+	Version:             "WIP",
+	FileLogPathElements: FileLogPathElements,
+	OutputModeEnvVar:    OutputModeEnvVar,
+	RootErrorMessage:    RootErrorMessage,
+	LoggingContext:      []interface{}{"version", version.Version},
+}
+
+func Run() {
+	AppConfig.Run()
+}
+
 func App(ctx context.Context, version string) *cobra.Command {
 	o := &Options{
 		Internal: Internal{ctx: ctx},
@@ -40,7 +56,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if o.Input.Debug {
 				config := o.BuildRun.Config.BuildEnvVars
-				contextutils.LoggerFrom(o.Internal.ctx).Infow("read build run config values",
+				contextutils.CliLogInfow(o.Internal.ctx, "logging build env vars to debug file",
 					"build_id", config.BuildId,
 					"commit_sha", config.CommitSha,
 					"tag_version", config.TagVersion)
@@ -74,7 +90,8 @@ func (o *Options) reportRelease() *cobra.Command {
 		Use:   "release",
 		Short: "reports if a build is a release build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println(stringForBoolToEnv(o.BuildRun.Config.ComputedBuildVars.Release))
+			cbv := o.BuildRun.Config.ComputedBuildVars
+			contextutils.CliLogInfow(o.Internal.ctx, stringForBoolToEnv(cbv.Release), "config", cbv)
 			return nil
 		},
 	}
@@ -86,7 +103,8 @@ func (o *Options) reportImageTag() *cobra.Command {
 		Use:   "image-tag",
 		Short: "reports the image tag to use for this build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println(o.BuildRun.Config.ComputedBuildVars.ImageTag)
+			cbv := o.BuildRun.Config.ComputedBuildVars
+			contextutils.CliLogInfow(o.Internal.ctx, cbv.ImageTag, "config", cbv)
 			return nil
 		},
 	}
@@ -98,7 +116,8 @@ func (o *Options) reportContainerPrefix() *cobra.Command {
 		Use:   "container-prefix",
 		Short: "reports the container repo and org spec (ex: gcr.io/solo-projects/)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println(o.BuildRun.Config.ComputedBuildVars.ContainerPrefix)
+			cbv := o.BuildRun.Config.ComputedBuildVars
+			contextutils.CliLogInfow(o.Internal.ctx, cbv.ContainerPrefix, "config", cbv)
 			return nil
 		},
 	}
@@ -135,10 +154,14 @@ func isRelease(ev *v1.BuildEnvVars) bool {
 }
 
 func getImageTag(ev *v1.BuildEnvVars) string {
+	tag := ev.BuildId
 	if isRelease(ev) {
-		return imageTagFromTaggedVersion(ev.TagVersion)
+		tag = imageTagFromTaggedVersion(ev.TagVersion)
 	}
-	return ev.BuildId
+	if tag == "" {
+		panic(fmt.Sprintf("must specify an image tag, none found for build env vars: %v", ev))
+	}
+	return tag
 }
 
 func imageTagFromTaggedVersion(tv string) string {
