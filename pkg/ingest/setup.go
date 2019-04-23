@@ -5,22 +5,30 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/pkg/errors"
+
 	v1 "github.com/solo-io/build/pkg/api/v1"
 	"github.com/solo-io/build/pkg/constants"
 	"github.com/solo-io/go-utils/protoutils"
 )
 
-func InitializeBuildRun() v1.BuildRun {
-	buildSpec := parseSpec()
-	buildRunConfig := getBuildRunConfigFromEnv(buildSpec)
+func InitializeBuildRun() (v1.BuildRun, error) {
+	buildSpec, err := parseSpec()
+	if err != nil {
+		return v1.BuildRun{}, err
+	}
+	buildRunConfig, err := getBuildRunConfigFromEnv(buildSpec)
+	if err != nil {
+		return v1.BuildRun{}, err
+	}
 	return v1.BuildRun{
 		Spec:   buildSpec,
 		Config: &buildRunConfig,
-	}
+	}, nil
 }
 
 // uses a config filename from env or default, in that order
-func parseSpec() *v1.BuildSpec {
+func parseSpec() (*v1.BuildSpec, error) {
 	filename := ""
 	spec := &v1.BuildSpec{}
 	envFile := os.Getenv(constants.EnvVarConfigFileName)
@@ -31,27 +39,31 @@ func parseSpec() *v1.BuildSpec {
 	}
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		return spec, errors.Wrapf(err, "could not parse build spec")
 	}
 	if err := protoutils.UnmarshalYaml(b, spec); err != nil {
-		panic(err)
+		return spec, errors.Wrapf(err, "could not unmarshal build spec")
 	}
-	return spec
+	return spec, nil
 }
 
-func getBuildRunConfigFromEnv(spec *v1.BuildSpec) v1.BuildRunConfig {
+func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 	ev := &v1.BuildEnvVars{}
 	ev.BuildId = os.Getenv(constants.EnvBuildId)
 	ev.CommitSha = os.Getenv(constants.EnvCommitSha)
 	ev.TagVersion = os.Getenv(constants.EnvTagVersion)
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
-	cv.ImageTag = getImageTag(ev)
-	cv.ContainerPrefix = getContainerPrefix(cv.Release, spec.Config)
+	if err := setImageTag(&cv.ImageTag, ev); err != nil {
+		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set image tag")
+	}
+	if err := setContainerPrefix(&cv.ContainerPrefix, cv.Release, spec.Config); err != nil {
+		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set container prefix")
+	}
 	return v1.BuildRunConfig{
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,
-	}
+	}, nil
 }
 
 func isRelease(ev *v1.BuildEnvVars) bool {
@@ -61,35 +73,37 @@ func isRelease(ev *v1.BuildEnvVars) bool {
 	return true
 }
 
-func getImageTag(ev *v1.BuildEnvVars) string {
-	tag := ev.BuildId
+func setImageTag(tag *string, ev *v1.BuildEnvVars) error {
+	*tag = ev.BuildId
 	if isRelease(ev) {
-		tag = imageTagFromTaggedVersion(ev.TagVersion)
+		if err := setImageTagFromTaggedVersion(tag, ev.TagVersion); err != nil {
+			return err
+		}
 	}
-	if tag == "" {
-		panic(fmt.Sprintf("must specify an image tag, none found for build env vars: %v", ev))
+	if *tag == "" {
+		return fmt.Errorf("must specify an image tag, none found for build env vars: %v", ev)
 	}
-	return tag
+	return nil
 }
 
-func imageTagFromTaggedVersion(tv string) string {
+func setImageTagFromTaggedVersion(tag *string, tv string) error {
 	if len(tv) < 2 {
-		panic("must have at least two characters in TaggedVersion")
+		return fmt.Errorf("must have at least two characters in TaggedVersion")
 	}
 	if tv[0] != 'v' {
-		panic(fmt.Sprintf("invalid tagged version: %v, must start with 'v'", tv))
+		return fmt.Errorf("invalid tagged version: %v, must start with 'v'", tv)
 	}
-	return tv[1:]
+	*tag = tv[1:]
+	return nil
 }
 
-func getContainerPrefix(isRelease bool, config *v1.BuildConfig) string {
+func setContainerPrefix(prefix *string, isRelease bool, config *v1.BuildConfig) error {
 	targetRegistry := config.ReleaseContainerRegistry
 	if !isRelease && config.TestContainerRegistry != nil {
 		targetRegistry = config.TestContainerRegistry
 	}
-	prefix := ""
-	if err := targetRegistry.GetPrefixFromContainerRegistry(&prefix); err != nil {
-		panic(err)
+	if err := targetRegistry.SetPrefixFromContainerRegistry(prefix); err != nil {
+		return errors.Wrapf(err, "could not set container prefix")
 	}
-	return prefix
+	return nil
 }

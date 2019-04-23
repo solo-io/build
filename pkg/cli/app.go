@@ -3,9 +3,9 @@ package cli
 import (
 	"context"
 
-	"github.com/solo-io/build/pkg/version"
-
 	"github.com/solo-io/build/pkg/ingest"
+
+	"github.com/solo-io/build/pkg/version"
 
 	"github.com/solo-io/go-utils/clicore"
 
@@ -45,13 +45,19 @@ func Run() {
 func App(ctx context.Context, version string) *cobra.Command {
 	o := &Options{
 		Internal: Internal{ctx: ctx},
-		BuildRun: ingest.InitializeBuildRun(),
 	}
 	app := &cobra.Command{
 		Use:     "build",
 		Short:   "CLI for solo.io's build tool",
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+
+			buildRun, err := ingest.InitializeBuildRun()
+			if err != nil {
+				return err
+			}
+			o.BuildRun = buildRun
+
 			if o.Input.Debug {
 				config := o.BuildRun.Config.BuildEnvVars
 				contextutils.CliLogInfow(o.Internal.ctx, "logging build env vars to debug file",

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (r *ContainerRegistry) GetPrefixFromContainerRegistry(prefix *string) error {
+func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error {
 	switch x := r.Registry.(type) {
 	case *ContainerRegistry_DockerHub:
 		return x.setRepoPrefix(prefix)
