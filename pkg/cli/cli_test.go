@@ -118,7 +118,6 @@ func appWithSimpleOutput(args string) (string, string, error) {
 	return co.CobraStdout, co.CobraStderr, nil
 }
 
-// This is all you need to do to use the cli logger in a test environment
 func appWithLoggerOutput(args string) clicore.CliOutput {
 	cliOutput, err := AppConfig.RunForTest(args)
 	Expect(err).NotTo(HaveOccurred())
