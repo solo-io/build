@@ -16,7 +16,7 @@ var _ = Describe("build cli", func() {
 
 	var (
 		initialEnv   = []string{}
-		confFilename = "../../solo-project.yaml"
+		confFilename = "../../examples/sample-solo-project.yaml"
 	)
 
 	var _ = BeforeEach(func() {
