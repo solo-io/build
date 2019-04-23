@@ -3,10 +3,11 @@ package cli
 import (
 	"context"
 
+	"github.com/solo-io/build/pkg/version"
+
 	"github.com/solo-io/build/pkg/ingest"
 
 	"github.com/solo-io/go-utils/clicore"
-	"k8s.io/helm/pkg/version"
 
 	"github.com/solo-io/go-utils/contextutils"
 
@@ -30,7 +31,7 @@ type Input struct {
 
 var AppConfig = clicore.CommandConfig{
 	Command:             App,
-	Version:             "WIP",
+	Version:             version.Version,
 	FileLogPathElements: FileLogPathElements,
 	OutputModeEnvVar:    OutputModeEnvVar,
 	RootErrorMessage:    RootErrorMessage,
