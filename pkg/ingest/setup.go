@@ -98,6 +98,9 @@ func setImageTagFromTaggedVersion(tag *string, tv string) error {
 }
 
 func setContainerPrefix(prefix *string, isRelease bool, config *v1.BuildConfig) error {
+	if config.ReleaseContainerRegistry == nil {
+		return fmt.Errorf("must provide a release_container_registry")
+	}
 	targetRegistry := config.ReleaseContainerRegistry
 	if !isRelease && config.TestContainerRegistry != nil {
 		targetRegistry = config.TestContainerRegistry

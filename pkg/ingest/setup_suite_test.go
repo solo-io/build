@@ -1,4 +1,4 @@
-package cli
+package ingest
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/solo-io/go-utils/testutils"
 )
 
-func TestCli(t *testing.T) {
+func TestIngest(t *testing.T) {
 
 	testutils.RegisterPreFailHandler(
 		func() {
@@ -17,5 +17,5 @@ func TestCli(t *testing.T) {
 	testutils.RegisterCommonFailHandlers()
 	RegisterFailHandler(Fail)
 	testutils.SetupLog()
-	RunSpecs(t, "build cli suite")
+	RunSpecs(t, "ingest suite")
 }
