@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+	"github.com/solo-io/go-utils/versionutils"
 
 	v1 "github.com/solo-io/build/pkg/api/v1"
 	"github.com/solo-io/build/pkg/constants"
@@ -76,24 +77,17 @@ func isRelease(ev *v1.BuildEnvVars) bool {
 func setImageTag(tag *string, ev *v1.BuildEnvVars) error {
 	*tag = ev.BuildId
 	if isRelease(ev) {
-		if err := setImageTagFromTaggedVersion(tag, ev.TagVersion); err != nil {
+		rv, err := versionutils.ParseVersion(ev.TagVersion)
+		if err != nil {
 			return err
 		}
+		rvString := rv.String()
+		*tag = rvString[1:]
+		return nil
 	}
 	if *tag == "" {
 		return fmt.Errorf("must specify an image tag, none found for build env vars: %v", ev)
 	}
-	return nil
-}
-
-func setImageTagFromTaggedVersion(tag *string, tv string) error {
-	if len(tv) < 2 {
-		return fmt.Errorf("must have at least two characters in TaggedVersion")
-	}
-	if tv[0] != 'v' {
-		return fmt.Errorf("invalid tagged version: %v, must start with 'v'", tv)
-	}
-	*tag = tv[1:]
 	return nil
 }
 

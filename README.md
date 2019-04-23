@@ -23,7 +23,7 @@ There are several other ways we could leverage the build specification:
 # Usage in a Makefile
 
 One of the goals of this tool is to move release logic from makefiles into golang libraries and scripts. Golang has more robust language and version control features than make, but make provides a more flexible and convenient user experience in some cases.
-It is expected that a major use of this tool will be augmenting makefile logic. It can be called from a binary (`build <args>`) or as a script (`go run build <args>`) 
+It is expected that a major use of this tool will be augmenting makefile logic. It should be called as a script (`go run cmd/build-my-project/main.go <args>`) so that you can lock the library into a particular version. 
 
 - Run from script
   - Create a `build.go` script somewhere in your project

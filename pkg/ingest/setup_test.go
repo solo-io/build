@@ -34,10 +34,11 @@ var _ = Describe("ingest config", func() {
 				TagVersion: "",
 				BuildId:    buildId,
 			}
-			tag := ""
+			const rootTag = "v1.2.3"
+			tag := rootTag
 			Expect(setImageTag(&tag, nonRelease)).NotTo(HaveOccurred())
 			Expect(tag).To(Equal(buildId))
-			taggedVersion := "v1.2.3"
+			taggedVersion := rootTag
 			version := "1.2.3"
 			release := &v1.BuildEnvVars{
 				TagVersion: taggedVersion,
@@ -45,13 +46,13 @@ var _ = Describe("ingest config", func() {
 			}
 			Expect(setImageTag(&tag, release)).NotTo(HaveOccurred())
 			Expect(tag).To(Equal(version))
-			// we don't require semver at this time, demonstration of forgiving surface:
+			// we require semver
 			release.TagVersion = "vabcdefg"
-			Expect(setImageTag(&tag, release)).NotTo(HaveOccurred())
+			Expect(setImageTag(&tag, release)).To(HaveOccurred())
 			release.TagVersion = "vv"
-			Expect(setImageTag(&tag, release)).NotTo(HaveOccurred())
+			Expect(setImageTag(&tag, release)).To(HaveOccurred())
 			release.TagVersion = "v with some space"
-			Expect(setImageTag(&tag, release)).NotTo(HaveOccurred())
+			Expect(setImageTag(&tag, release)).To(HaveOccurred())
 		})
 		It("should error for invalid configs", func() {
 			buildId := "12345"
