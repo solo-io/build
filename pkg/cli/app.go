@@ -33,16 +33,18 @@ func App(ctx context.Context, version string) *cobra.Command {
 		Internal: Internal{ctx: ctx},
 		BuildRun: InitializeBuildRun(),
 	}
-	config := o.BuildRun.Config.BuildEnvVars
-	contextutils.LoggerFrom(o.Internal.ctx).Infow("read build run config values",
-		"build_id", config.BuildId,
-		"commit_sha", config.CommitSha,
-		"tag_version", config.TagVersion)
 	app := &cobra.Command{
 		Use:     "build",
 		Short:   "CLI for solo.io's build tool",
 		Version: version,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if o.Input.Debug {
+				config := o.BuildRun.Config.BuildEnvVars
+				contextutils.LoggerFrom(o.Internal.ctx).Infow("read build run config values",
+					"build_id", config.BuildId,
+					"commit_sha", config.CommitSha,
+					"tag_version", config.TagVersion)
+			}
 			return nil
 		},
 	}
@@ -51,6 +53,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 		o.parseBuildEnvArgs(),
 	)
 	app.PersistentFlags().BoolVar(&o.Input.Debug, "debug", false, "enable verbose debug output")
+	app.ParseFlags([]string{})
 	return app
 }
 
@@ -61,7 +64,8 @@ func (o *Options) parseBuildEnvArgs() *cobra.Command {
 	}
 	cmd.AddCommand(
 		o.reportRelease(),
-		o.reportImageTag())
+		o.reportImageTag(),
+		o.reportContainerPrefix())
 	return cmd
 }
 
@@ -89,6 +93,18 @@ func (o *Options) reportImageTag() *cobra.Command {
 	return cmd
 }
 
+func (o *Options) reportContainerPrefix() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "container-prefix",
+		Short: "reports the container repo and org spec (ex: gcr.io/solo-projects/)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println(o.BuildRun.Config.ComputedBuildVars.ContainerPrefix)
+			return nil
+		},
+	}
+	return cmd
+}
+
 func stringForBoolToEnv(b bool) string {
 	if b {
 		return constants.PrintEnvTrue
@@ -104,6 +120,7 @@ func getBuildRunConfigFromEnv() v1.BuildRunConfig {
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
 	cv.ImageTag = getImageTag(ev)
+	cv.ContainerPrefix = "TODO-CONTAINER-PREFIX"
 	return v1.BuildRunConfig{
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,

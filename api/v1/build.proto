@@ -19,9 +19,15 @@ message BuildEnvVars {
     string tag_version = 3;
 }
 
+// Holds all values that are computed at build time according to build conditions
 message ComputedBuildVars {
+    // indicates if this build is a release
     bool release = 1;
+    // the image tag to use for all images created during this build session
     string image_tag = 2;
+    // the container repo and organization to be used for all images created during this build session
+    // ex: gcr.io/solo-projects/
+    string container_prefix = 3;
 }
 
 message GcloudConfig {
