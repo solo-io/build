@@ -83,10 +83,10 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: nil,
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("gcr.io/aproject/"))
+			Expect(prefix).To(Equal("gcr.io/aproject"))
 			release = true
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("gcr.io/aproject/"))
+			Expect(prefix).To(Equal("gcr.io/aproject"))
 		})
 		It("should error for invalid single container configs", func() {
 			prefix := ""
@@ -128,10 +128,10 @@ var _ = Describe("ingest config", func() {
 				},
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("quay.io/an-org/"))
+			Expect(prefix).To(Equal("quay.io/an-org"))
 			release = true
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("gcr.io/aproject/"))
+			Expect(prefix).To(Equal("gcr.io/aproject"))
 		})
 		It("should validate gcr container specs correctly", func() {
 			prefix := ""
@@ -148,7 +148,7 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: nil,
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("gcr.io/aproject/"))
+			Expect(prefix).To(Equal("gcr.io/aproject"))
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = ""
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = "gcr.io"
@@ -173,7 +173,7 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: nil,
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("quay.io/an-org/"))
+			Expect(prefix).To(Equal("quay.io/an-org"))
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Quay).Quay.BaseUrl = ""
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Quay).Quay.BaseUrl = "quay.io"
@@ -195,7 +195,7 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: nil,
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal(""))
+			Expect(prefix).To(Equal("docker.io"))
 		})
 	})
 })

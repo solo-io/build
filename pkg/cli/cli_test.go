@@ -76,7 +76,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "quay.io/solo-io/",
+			consoleLogOut:  "quay.io/solo-io",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get container prefix for test",
@@ -86,7 +86,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "gcr.io/solo-projects/",
+			consoleLogOut:  "gcr.io/solo-projects",
 			consoleLogErr:  "",
 		}}
 		It("should handle parse-env cases", func() {

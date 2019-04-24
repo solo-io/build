@@ -20,7 +20,7 @@ var _ = Describe("container registry", func() {
 			Registry: &ContainerRegistry_DockerHub{},
 		}
 		Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
-		Expect(prefix).To(Equal(""))
+		Expect(prefix).To(Equal(dockerRepoUrl))
 	})
 
 	It("should handle quay", func() {
@@ -35,7 +35,7 @@ var _ = Describe("container registry", func() {
 			},
 		}
 		Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
-		Expect(prefix).To(Equal("quay.io/myorg/"))
+		Expect(prefix).To(Equal("quay.io/myorg"))
 	})
 
 	It("should handle gcr", func() {
@@ -49,6 +49,6 @@ var _ = Describe("container registry", func() {
 			},
 		}
 		Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
-		Expect(prefix).To(Equal("gcr.io/myproject/"))
+		Expect(prefix).To(Equal("gcr.io/myproject"))
 	})
 })

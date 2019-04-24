@@ -17,8 +17,10 @@ func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error
 	}
 }
 
+const dockerRepoUrl = "docker.io"
+
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {
-	*prefix = ""
+	*prefix = dockerRepoUrl
 	return nil
 }
 
@@ -29,7 +31,7 @@ func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
 	if x.Quay.Organization == "" {
 		return fmt.Errorf("must provide an organization for quay repos")
 	}
-	*prefix = fmt.Sprintf("%s/%s/", x.Quay.BaseUrl, x.Quay.Organization)
+	*prefix = fmt.Sprintf("%s/%s", x.Quay.BaseUrl, x.Quay.Organization)
 	return nil
 }
 
@@ -40,6 +42,6 @@ func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
 	if x.Gcr.ProjectName == "" {
 		return fmt.Errorf("must provide a project name for gcr repos")
 	}
-	*prefix = fmt.Sprintf("%s/%s/", x.Gcr.BaseUrl, x.Gcr.ProjectName)
+	*prefix = fmt.Sprintf("%s/%s", x.Gcr.BaseUrl, x.Gcr.ProjectName)
 	return nil
 }
