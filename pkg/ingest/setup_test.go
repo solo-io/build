@@ -8,13 +8,6 @@ import (
 
 var _ = Describe("ingest config", func() {
 
-	var ()
-
-	var _ = BeforeEach(func() {
-	})
-	var _ = AfterEach(func() {
-	})
-
 	Context("unit test isRelease", func() {
 		It("should report release correctly", func() {
 			ev1 := &v1.BuildEnvVars{
