@@ -63,7 +63,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 				contextutils.CliLogInfow(o.Internal.ctx, "logging build env vars to debug file",
 					"build_id", config.BuildId,
 					"commit_sha", config.CommitSha,
-					"tag_version", config.TagVersion)
+					"tag_version", config.TaggedVersion)
 			}
 			return nil
 		},

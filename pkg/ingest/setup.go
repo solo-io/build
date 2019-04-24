@@ -52,7 +52,7 @@ func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 	ev := &v1.BuildEnvVars{}
 	ev.BuildId = os.Getenv(constants.EnvBuildId)
 	ev.CommitSha = os.Getenv(constants.EnvCommitSha)
-	ev.TagVersion = os.Getenv(constants.EnvTagVersion)
+	ev.TaggedVersion = os.Getenv(constants.EnvTagVersion)
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
 	if err := setImageTag(&cv.ImageTag, ev); err != nil {
@@ -68,7 +68,7 @@ func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 }
 
 func isRelease(ev *v1.BuildEnvVars) bool {
-	if ev.TagVersion == "" {
+	if ev.TaggedVersion == "" {
 		return false
 	}
 	return true
@@ -77,7 +77,7 @@ func isRelease(ev *v1.BuildEnvVars) bool {
 func setImageTag(tag *string, ev *v1.BuildEnvVars) error {
 	*tag = ev.BuildId
 	if isRelease(ev) {
-		rv, err := versionutils.ParseVersion(ev.TagVersion)
+		rv, err := versionutils.ParseVersion(ev.TaggedVersion)
 		if err != nil {
 			return err
 		}

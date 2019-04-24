@@ -4,7 +4,7 @@ generate:
 
 .PHONY: call-sample-release
 call-sample-release:
-	SOLOBUILD_CONFIG_FILE=./examples/sample-solo-project.yaml TAG_VERSION=v1.2.3 BUILD_ID=12345 make -f examples/sample.makefile print-release-vals
+	SOLOBUILD_CONFIG_FILE=./examples/sample-solo-project.yaml TAGGED_VERSION=v1.2.3 BUILD_ID=12345 make -f examples/sample.makefile print-release-vals
 
 .PHONY: call-sample-nonrelease
 call-sample-nonrelease:

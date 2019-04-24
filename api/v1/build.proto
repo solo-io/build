@@ -16,7 +16,7 @@ message BuildRunConfig {
 message BuildEnvVars {
     string build_id = 1;
     string commit_sha = 2;
-    string tag_version = 3;
+    string tagged_version = 3;
 }
 
 // Holds all values that are computed at build time according to build conditions

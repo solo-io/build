@@ -18,11 +18,11 @@ var _ = Describe("ingest config", func() {
 	Context("unit test isRelease", func() {
 		It("should report release correctly", func() {
 			ev1 := &v1.BuildEnvVars{
-				TagVersion: "",
+				TaggedVersion: "",
 			}
 			Expect(isRelease(ev1)).To(Equal(false))
 			ev2 := &v1.BuildEnvVars{
-				TagVersion: "v1.2.3",
+				TaggedVersion: "v1.2.3",
 			}
 			Expect(isRelease(ev2)).To(Equal(true))
 		})
@@ -31,8 +31,8 @@ var _ = Describe("ingest config", func() {
 		It("should report tag correctly for valid configs", func() {
 			buildId := "12345"
 			nonRelease := &v1.BuildEnvVars{
-				TagVersion: "",
-				BuildId:    buildId,
+				TaggedVersion: "",
+				BuildId:       buildId,
 			}
 			const rootTag = "v1.2.3"
 			tag := rootTag
@@ -41,36 +41,36 @@ var _ = Describe("ingest config", func() {
 			taggedVersion := rootTag
 			version := "1.2.3"
 			release := &v1.BuildEnvVars{
-				TagVersion: taggedVersion,
-				BuildId:    buildId,
+				TaggedVersion: taggedVersion,
+				BuildId:       buildId,
 			}
 			Expect(setImageTag(&tag, release)).NotTo(HaveOccurred())
 			Expect(tag).To(Equal(version))
 			// we require semver
-			release.TagVersion = "vabcdefg"
+			release.TaggedVersion = "vabcdefg"
 			Expect(setImageTag(&tag, release)).To(HaveOccurred())
-			release.TagVersion = "vv"
+			release.TaggedVersion = "vv"
 			Expect(setImageTag(&tag, release)).To(HaveOccurred())
-			release.TagVersion = "v with some space"
+			release.TaggedVersion = "v with some space"
 			Expect(setImageTag(&tag, release)).To(HaveOccurred())
 		})
 		It("should error for invalid configs", func() {
 			buildId := "12345"
 			nonReleaseNoBuildId := &v1.BuildEnvVars{
-				TagVersion: "",
-				BuildId:    "",
+				TaggedVersion: "",
+				BuildId:       "",
 			}
 			tag := ""
 			Expect(setImageTag(&tag, nonReleaseNoBuildId)).To(HaveOccurred())
 			taggedVersion := "1.2.3"
 			releaseBadTaggedVersion := &v1.BuildEnvVars{
-				TagVersion: taggedVersion,
-				BuildId:    buildId,
+				TaggedVersion: taggedVersion,
+				BuildId:       buildId,
 			}
 			Expect(setImageTag(&tag, releaseBadTaggedVersion)).To(HaveOccurred())
-			releaseBadTaggedVersion.TagVersion = "v"
+			releaseBadTaggedVersion.TaggedVersion = "v"
 			Expect(setImageTag(&tag, releaseBadTaggedVersion)).To(HaveOccurred())
-			releaseBadTaggedVersion.TagVersion = "a1.2.3"
+			releaseBadTaggedVersion.TaggedVersion = "a1.2.3"
 			Expect(setImageTag(&tag, releaseBadTaggedVersion)).To(HaveOccurred())
 		})
 	})
