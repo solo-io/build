@@ -88,6 +88,26 @@ var _ = Describe("build cli", func() {
 			cobraErr:       "",
 			consoleLogOut:  "gcr.io/solo-projects",
 			consoleLogErr:  "",
+		}, {
+			description:    "should get version for release",
+			args:           "parse-env version",
+			buildId:        "1234",
+			taggedVersion:  "v1.2.3",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "",
+			consoleLogOut:  "1.2.3",
+			consoleLogErr:  "",
+		}, {
+			description:    "should get version for test",
+			args:           "parse-env version",
+			buildId:        "1234",
+			taggedVersion:  "",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "",
+			consoleLogOut:  "1234",
+			consoleLogErr:  "",
 		}}
 		It("should handle parse-env cases", func() {
 			for _, tc := range parseEnvTestCases {

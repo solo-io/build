@@ -62,7 +62,6 @@ func App(ctx context.Context, version string) *cobra.Command {
 				config := o.BuildRun.Config.BuildEnvVars
 				contextutils.CliLogInfow(o.Internal.ctx, "logging build env vars to debug file",
 					"build_id", config.BuildId,
-					"commit_sha", config.CommitSha,
 					"tag_version", config.TaggedVersion)
 			}
 			return nil
@@ -85,7 +84,8 @@ func (o *Options) parseBuildEnvArgs() *cobra.Command {
 	cmd.AddCommand(
 		o.reportRelease(),
 		o.reportImageTag(),
-		o.reportContainerPrefix())
+		o.reportContainerPrefix(),
+		o.reportVersion())
 	return cmd
 }
 
@@ -122,6 +122,19 @@ func (o *Options) reportContainerPrefix() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cbv := o.BuildRun.Config.ComputedBuildVars
 			contextutils.CliLogInfow(o.Internal.ctx, cbv.ContainerPrefix, "config", cbv)
+			return nil
+		},
+	}
+	return cmd
+}
+
+func (o *Options) reportVersion() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "reports the version of the source being build (tag during release, build id during test)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cbv := o.BuildRun.Config.ComputedBuildVars
+			contextutils.CliLogInfow(o.Internal.ctx, cbv.Version, "config", cbv)
 			return nil
 		},
 	}

@@ -15,8 +15,7 @@ message BuildRunConfig {
 
 message BuildEnvVars {
     string build_id = 1;
-    string commit_sha = 2;
-    string tagged_version = 3;
+    string tagged_version = 2;
 }
 
 // Holds all values that are computed at build time according to build conditions
@@ -28,6 +27,10 @@ message ComputedBuildVars {
     // the container repo and organization to be used for all images created during this build session
     // ex: gcr.io/solo-projects/
     string container_prefix = 3;
+    // the version associated with the source code being built
+    // during a release, matches the semver tag
+    // during a test build, matches the build id
+    string version = 4;
 }
 
 //message GcloudConfig {

@@ -51,10 +51,14 @@ func parseSpec() (*v1.BuildSpec, error) {
 func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 	ev := &v1.BuildEnvVars{}
 	ev.BuildId = os.Getenv(constants.EnvBuildId)
-	ev.CommitSha = os.Getenv(constants.EnvCommitSha)
 	ev.TaggedVersion = os.Getenv(constants.EnvTagVersion)
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
+	var err error
+	cv.Version, err = getVersion(cv.Release, ev.TaggedVersion, ev.BuildId)
+	if err != nil {
+		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not get version")
+	}
 	if err := setImageTag(&cv.ImageTag, ev); err != nil {
 		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set image tag")
 	}
@@ -65,6 +69,18 @@ func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,
 	}, nil
+}
+
+func getVersion(release bool, taggedVersion, buildId string) (string, error) {
+	version := buildId
+	if release {
+		var err error
+		version, err = versionutils.GetVersionFromTag(taggedVersion)
+		if err != nil {
+			return "", err
+		}
+	}
+	return version, nil
 }
 
 func isRelease(ev *v1.BuildEnvVars) bool {
