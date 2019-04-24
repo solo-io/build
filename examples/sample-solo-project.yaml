@@ -1,13 +1,4 @@
 config:
-  repo_org: solo-io
-  repo_name: sm-marketplace
-  output_directory: _output
-  version_var: github.com/solo-io/sm-marketplace/services/internal/version.Version
-  gcloud:
-    project_id: gloo-ee
-    decrypt_key: build-key
-    decrypt_keyring: build
-    helm_chart_bucket: sm-marketplace-helm
   release_container_registry:
     quay:
       base_url: quay.io
@@ -17,38 +8,4 @@ config:
     gcr:
       base_url: gcr.io
       project_name: solo-projects
-checks:
-  - solo_kit_generation:
-  - code_generation:
-      entrypoint: make generated-ui
-  - check_format: {}
-  - check_spelling: {}
-manifests:
-  - helm:
-      name: sm-marketplace
-      upload_yaml_to_github: true
-compile:
-  - go_compile:
-    - name: smm-apiserver
-      entry_point: services/apiserver/cmd/main.go
-      platforms: ["linux"]
-      upload_to_github: false
-    - name: smm-operator
-      entry_point: services/operator/cmd/main.go
-      platforms: ["linux"]
-      upload_to_github: false
-  - yarn_compile:
-      directory: ui
-containers:
-  - image_name: smm-operator
-    docker_file: services/operator/cmd/Dockerfile
-  - image_name: smm-apiserver
-    docker_file: services/apiserver/cmd/Dockerfile
-  - image_name: smm-envoy
-    docker_file: envoy/Dockerfile
-  - image_name: smm-ui
-    docker_file: ui/Dockerfile
-test_runs:
-  - args: ['-r']
-    env:
 
