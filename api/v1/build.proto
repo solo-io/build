@@ -109,11 +109,11 @@ message ContainerRegistry {
 message QuayRegistry {
     string base_url = 1;
     string organization = 2;
-    string encrypted_token = 3;
+//    string encrypted_token = 3;
 }
 
 message DockerHubRegistry {
-    string encrypted_token = 1;
+//    string encrypted_token = 1;
 }
 
 message GoogleContainerRegistry {

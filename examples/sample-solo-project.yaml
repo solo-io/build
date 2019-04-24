@@ -3,7 +3,6 @@ config:
     quay:
       base_url: quay.io
       organization: solo-io
-      encrypted_token: CiQAwdWthifvdUjpVHAln3ZIz4WljWx6qLt8E4yJArmrU4/1HQoSaQD5SXFIeMulT7DxGdwW0L9R+gA0SATR05xpTz7JS9LXJK+4iYPlFvVPs7O3DYee2YPJoF7o44vJ94+AyuMLQucS6BhHXQ0t//GvQWaFvdcTO4qH5HYgGQSrRY0a4E3l+4q6/M4da2m98Q==
   test_container_registry:
     gcr:
       base_url: gcr.io
