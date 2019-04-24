@@ -46,11 +46,8 @@ IMAGE_TAG := $(shell go run cmd/read_env/main.go parse-env image-tag)
 CONTAINER_PREFIX := $(shell go run cmd/read_env/main.go parse-env container-prefix)
 ```
 
-
-
 ## Compute release
 `RELEASE = build parse-env release`
 
 ## Compute image tag
 `IMAGE_TAG = build parse-env image-tag`
-
