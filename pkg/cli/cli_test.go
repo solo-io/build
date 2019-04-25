@@ -116,7 +116,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "",
+			consoleLogOut:  "build parameters are valid\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with omission error",
@@ -125,7 +125,7 @@ var _ = Describe("build cli", func() {
 			taggedVersion:  "",
 			configFileName: confFilename,
 			cobraOut:       "",
-			cobraErr:       "Error: expected 4 arguments, received 3",
+			cobraErr:       "Error: did not receive the expected computed variables: expected 4 arguments, received 3",
 			consoleLogOut:  "",
 			consoleLogErr:  "",
 		}, {
@@ -135,16 +135,16 @@ var _ = Describe("build cli", func() {
 			taggedVersion:  "",
 			configFileName: confFilename,
 			cobraOut:       "",
-			cobraErr:       "Error: image tag wants: 1234, got: 454545",
+			cobraErr:       "Error: did not receive the expected computed variables: image tag wants: 1234, got: 454545",
 			consoleLogOut:  "",
 			consoleLogErr:  "",
 		}}
 		It("should handle parse-env cases", func() {
 			for _, tc := range parseEnvTestCases {
 				By(fmt.Sprintf("Test case: %s, args: %s", tc.description, tc.args))
-				os.Setenv(constants.EnvBuildId, tc.buildId)
-				os.Setenv(constants.EnvTagVersion, tc.taggedVersion)
-				os.Setenv(constants.EnvVarConfigFileName, tc.configFileName)
+				Expect(os.Setenv(constants.EnvBuildId, tc.buildId)).NotTo(HaveOccurred())
+				Expect(os.Setenv(constants.EnvTagVersion, tc.taggedVersion)).NotTo(HaveOccurred())
+				Expect(os.Setenv(constants.EnvVarConfigFileName, tc.configFileName)).NotTo(HaveOccurred())
 				out := appWithLoggerOutput(tc.args)
 				Expect(out.CobraStdout).To(Equal(tc.cobraOut))
 				Expect(out.CobraStderr).To(MatchRegexp(tc.cobraErr))
@@ -178,6 +178,6 @@ func applyEnv(evs []string) {
 	for _, ev := range evs {
 		kv := strings.SplitN(ev, "=", 2)
 		Expect(len(kv)).To(Equal(2))
-		os.Setenv(kv[0], kv[1])
+		Expect(os.Setenv(kv[0], kv[1])).NotTo(HaveOccurred())
 	}
 }
