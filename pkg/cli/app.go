@@ -54,7 +54,6 @@ func App(ctx context.Context, version string) *cobra.Command {
 		Short:   "CLI for solo.io's build tool",
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-
 			buildRun, err := ingest.InitializeBuildRun()
 			if err != nil {
 				return err
@@ -76,25 +75,12 @@ func App(ctx context.Context, version string) *cobra.Command {
 		o.validateOperatingParameters(),
 	)
 	app.PersistentFlags().BoolVar(&o.Input.Debug, "debug", false, "enable verbose debug output")
-	app.ParseFlags([]string{})
 	return app
 }
 
-func (o *Options) validateOperatingParameters() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "validate-operating-parameters",
-		Short: "for use by scripts for closed-loop communication: exits gracefully if provided arguments match computed values, exits with error otherwise",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := ingest.ValidateOperatingParameters(args, o.BuildRun.Config.ComputedBuildVars)
-			if err != nil {
-				errors.Wrapf(err, "did not receive the expected computed variables")
-			}
-			contextutils.CliLogInfow(o.Internal.ctx, "build parameters are valid", "computed_build_vars", o.BuildRun.Config.ComputedBuildVars)
-			return nil
-		},
-	}
-	return cmd
-}
+//------------------------------------------------------------------------------
+// parse-env
+//------------------------------------------------------------------------------
 
 func (o *Options) reportComputedValues() *cobra.Command {
 	cmd := &cobra.Command{
@@ -155,6 +141,26 @@ func (o *Options) reportVersion() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cbv := o.BuildRun.Config.ComputedBuildVars
 			contextutils.CliLogInfow(o.Internal.ctx, cbv.Version, "config", cbv)
+			return nil
+		},
+	}
+	return cmd
+}
+
+//------------------------------------------------------------------------------
+// validate-operating-parameters
+//------------------------------------------------------------------------------
+
+func (o *Options) validateOperatingParameters() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "validate-operating-parameters",
+		Short: "for use by scripts for closed-loop communication: exits gracefully if provided arguments match computed values, exits with error otherwise",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := ingest.ValidateOperatingParameters(args, o.BuildRun.Config.ComputedBuildVars)
+			if err != nil {
+				return errors.Wrapf(err, "did not receive the expected computed variables")
+			}
+			contextutils.CliLogInfow(o.Internal.ctx, "build parameters are valid", "computed_build_vars", o.BuildRun.Config.ComputedBuildVars)
 			return nil
 		},
 	}
