@@ -86,7 +86,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "gcr.io/solo-projects\n",
+			consoleLogOut:  "gcr.io/solo-public\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get version for release",
@@ -110,7 +110,7 @@ var _ = Describe("build cli", func() {
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate without error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects 1234",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public 1234",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
@@ -120,7 +120,7 @@ var _ = Describe("build cli", func() {
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with omission error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
@@ -130,7 +130,7 @@ var _ = Describe("build cli", func() {
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with value error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects 454545",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public 454545",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,

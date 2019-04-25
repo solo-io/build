@@ -6,5 +6,5 @@ config:
   test_container_registry:
     gcr:
       base_url: gcr.io
-      project_name: solo-projects
+      project_name: solo-public
 

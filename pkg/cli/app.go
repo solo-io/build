@@ -124,7 +124,7 @@ func (o *Options) reportImageTag() *cobra.Command {
 func (o *Options) reportContainerPrefix() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "container-prefix",
-		Short: "reports the container repo and org spec (ex: gcr.io/solo-projects/)",
+		Short: "reports the container repo and org spec (ex: gcr.io/solo-public/)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cbv := o.BuildRun.Config.ComputedBuildVars
 			contextutils.CliLogInfow(o.Internal.ctx, cbv.ContainerPrefix, "config", cbv)

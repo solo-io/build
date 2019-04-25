@@ -166,7 +166,7 @@ type ComputedBuildVars struct {
 	// the image tag to use for all images created during this build session
 	ImageTag string `protobuf:"bytes,2,opt,name=image_tag,json=imageTag,proto3" json:"image_tag,omitempty"`
 	// the container repo and organization to be used for all images created during this build session
-	// ex: gcr.io/solo-projects/
+	// ex: gcr.io/solo-public/
 	ContainerPrefix string `protobuf:"bytes,3,opt,name=container_prefix,json=containerPrefix,proto3" json:"container_prefix,omitempty"`
 	// the version associated with the source code being built
 	// during a release, matches the semver tag

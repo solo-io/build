@@ -13,4 +13,4 @@ print-release-vals:
 
 .PHONY: validate-operating-parameters-ok
 validate-operating-parameters-ok:
-	go run cmd/read_env/main.go validate-operating-parameters "" 12345 gcr.io/solo-projects 12345
+	go run cmd/read_env/main.go validate-operating-parameters "" 12345 gcr.io/solo-public 12345
