@@ -3,6 +3,8 @@ package cli
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/solo-io/build/pkg/envutils"
 
 	"github.com/solo-io/build/pkg/ingest"
@@ -83,11 +85,17 @@ func (o *Options) validateOperatingParameters() *cobra.Command {
 		Use:   "validate-operating-parameters",
 		Short: "for use by scripts for closed-loop communication: exits gracefully if provided arguments match computed values, exits with error otherwise",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return ingest.ValidateOperatingParameters(args, o.BuildRun.Config.ComputedBuildVars)
+			err := ingest.ValidateOperatingParameters(args, o.BuildRun.Config.ComputedBuildVars)
+			if err != nil {
+				errors.Wrapf(err, "did not receive the expected computed variables")
+			}
+			contextutils.CliLogInfow(o.Internal.ctx, "build parameters are valid", "computed_build_vars", o.BuildRun.Config.ComputedBuildVars)
+			return nil
 		},
 	}
 	return cmd
 }
+
 func (o *Options) reportComputedValues() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "parse-env",
