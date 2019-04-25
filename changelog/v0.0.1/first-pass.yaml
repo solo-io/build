@@ -1,0 +1,4 @@
+changelog:
+- type: NEW_FEATURE
+  description: Extract container spec logic from makefile to go lib and cli tool.
+  issueLink: https://github.com/solo-io/build/issues/2

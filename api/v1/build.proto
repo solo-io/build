@@ -1,0 +1,165 @@
+syntax = "proto3";
+package build.solo.io;
+option go_package = "v1";
+
+message BuildRun {
+    BuildSpec spec = 1;
+    BuildRunConfig config = 2;
+}
+
+// This contains a few extra things at build time
+message BuildRunConfig {
+    BuildEnvVars build_env_vars = 1;
+    ComputedBuildVars computed_build_vars = 2;
+}
+
+message BuildEnvVars {
+    string build_id = 1;
+    string tagged_version = 2;
+}
+
+// Holds all values that are computed at build time according to build conditions
+message ComputedBuildVars {
+    // indicates if this build is a release
+    bool release = 1;
+    // the image tag to use for all images created during this build session
+    string image_tag = 2;
+    // the container repo and organization to be used for all images created during this build session
+    // ex: gcr.io/solo-public/
+    string container_prefix = 3;
+    // the version associated with the source code being built
+    // during a release, matches the semver tag
+    // during a test build, matches the build id
+    string version = 4;
+}
+
+//message GcloudConfig {
+//    string project_id = 4;
+//    string decrypt_key = 5;
+//    string decrypt_keyring = 6;
+//
+//    // optional location to put helm charts
+//    string helm_chart_bucket = 7;
+//}
+
+// This gets checked into project repo
+message BuildSpec {
+    BuildConfig config = 1;
+//    repeated Check checks = 2;
+//    repeated Manifest manifests = 3;
+//    repeated Compile compile = 4;
+//    repeated TestRun test_runs = 5;
+//    repeated Container containers = 6;
+//    Docs docs = 7;
+//    Distribution distribution = 8;
+}
+
+//message Manifest {
+//    oneof manifest {
+//        HelmChart helm = 1;
+//    }
+//}
+//
+//message HelmChart {
+//    string name = 1;
+//    bool upload_yaml_to_github = 2;
+//}
+//
+//message GoCompile {
+//    string name = 1;
+//    string entry_point = 2;
+//    repeated string platforms = 3;
+//    bool upload_to_github = 4;
+//}
+//
+//message Compile {
+//    repeated GoCompile go_compile = 1;
+//    YarnCompile yarn_compile = 2;
+//}
+//
+//message YarnCompile {
+//    string directory = 1;
+//}
+//
+//message Container {
+//    string image_name = 1;
+//    string docker_file = 2;
+//}
+
+message BuildConfig {
+//    string repo_org = 1;
+//    string repo_name = 2;
+//    string output_directory = 3;
+//    string version_var = 4;
+
+//    oneof ci_config {
+//        GcloudConfig gcloud = 10;
+//    }
+
+    ContainerRegistry release_container_registry = 20;
+    // optional, if not provided, will use the same registry for release and test
+    ContainerRegistry test_container_registry = 21;
+}
+
+message ContainerRegistry {
+    oneof registry {
+        QuayRegistry quay = 10;
+        DockerHubRegistry docker_hub = 11;
+        GoogleContainerRegistry gcr = 12;
+    }
+}
+
+message QuayRegistry {
+    string base_url = 1;
+    string organization = 2;
+//    string encrypted_token = 3;
+}
+
+message DockerHubRegistry {
+//    string encrypted_token = 1;
+}
+
+message GoogleContainerRegistry {
+    string base_url = 1;
+    string project_name = 2;
+}
+
+//message TestRun {
+//    repeated string args = 1;
+//    map<string,string> env = 2;
+//}
+//
+//message CodeGeneration {
+//    string entrypoint = 1;
+//}
+//
+//message SoloKitGeneration {
+//    repeated string make_dependencies = 2;
+//    repeated string gopath_dependencies = 3;
+//}
+//
+//message Check {
+//    oneof check {
+//        SoloKitGeneration solo_kit_generation = 1;
+//        CodeGeneration code_generation = 2;
+//        CheckFormat check_format = 3;
+//        CheckSpelling check_spelling = 4;
+//    }
+//}
+//
+//message CheckFormat {
+//
+//}
+//
+//message CheckSpelling {
+//
+//}
+//
+//message Docs {
+//    // TODO
+//}
+//
+//message Distribution {
+//    // TODO
+//    // brew and gofish
+//}
