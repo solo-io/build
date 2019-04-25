@@ -48,7 +48,7 @@ CONTAINER_PREFIX := $(shell go run cmd/read_env/main.go parse-env container-pref
 
 .PHONY: verify-args
 verify-args:
-    go run buildcmd/main.go validate-args \
+    go run buildcmd/main.go validate-operating-parameters \
     	$(RELEASE) \
     	$(VERSION) \
     	$(CONTAINER_REPO_ORG) \
@@ -63,3 +63,4 @@ every-other-make-target: verify-args <other-dependencies>
 
 ## Compute image tag
 `IMAGE_TAG = build parse-env image-tag`
+
