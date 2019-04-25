@@ -9,3 +9,7 @@ call-sample-release:
 .PHONY: call-sample-nonrelease
 call-sample-nonrelease:
 	SOLOBUILD_CONFIG_FILE=./examples/sample-solo-project.yaml BUILD_ID=12345 make -f examples/sample.makefile print-release-vals
+
+.PHONY: validate-operating-parameters-ok
+validate-operating-parameters-ok:
+	SOLOBUILD_CONFIG_FILE=./examples/sample-solo-project.yaml BUILD_ID=12345 make -f examples/sample.makefile validate-operating-parameters-ok

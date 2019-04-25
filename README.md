@@ -42,9 +42,21 @@ func main(){
 ```make
 # These are each evaluated a single time when the makefile is loaded
 RELEASE := $(shell go run cmd/read_env/main.go parse-env release)
+VERSION := $(shell go run cmd/read_env/main.go parse-env version)
 IMAGE_TAG := $(shell go run cmd/read_env/main.go parse-env image-tag)
 CONTAINER_PREFIX := $(shell go run cmd/read_env/main.go parse-env container-prefix)
+
+.PHONY: verify-args
+verify-args:
+    go run buildcmd/main.go validate-args \
+    	$(RELEASE) \
+    	$(VERSION) \
+    	$(CONTAINER_REPO_ORG) \
+    	$(IMAGE_TAG)
+    	
+every-other-make-target: verify-args <other-dependencies>
 ```
+- note that all your make targets should depend on the `verify-args` target so that the build can exit if there was a configuration error
 
 ## Compute release
 `RELEASE = build parse-env release`

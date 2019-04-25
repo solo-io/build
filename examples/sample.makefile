@@ -9,3 +9,8 @@ print-release-vals:
 	echo $(RELEASE)
 	echo $(IMAGE_TAG)
 	echo $(CONTAINER_PREFIX)
+
+
+.PHONY: validate-operating-parameters-ok
+validate-operating-parameters-ok:
+	go run cmd/read_env/main.go validate-operating-parameters "" 12345 gcr.io/solo-projects 12345

@@ -3,6 +3,8 @@ package cli
 import (
 	"context"
 
+	"github.com/solo-io/build/pkg/envutils"
+
 	"github.com/solo-io/build/pkg/ingest"
 
 	"github.com/solo-io/build/pkg/version"
@@ -12,7 +14,6 @@ import (
 	"github.com/solo-io/go-utils/contextutils"
 
 	v1 "github.com/solo-io/build/pkg/api/v1"
-	"github.com/solo-io/build/pkg/constants"
 	"github.com/spf13/cobra"
 )
 
@@ -69,14 +70,25 @@ func App(ctx context.Context, version string) *cobra.Command {
 	}
 
 	app.AddCommand(
-		o.parseBuildEnvArgs(),
+		o.reportComputedValues(),
+		o.validateOperatingParameters(),
 	)
 	app.PersistentFlags().BoolVar(&o.Input.Debug, "debug", false, "enable verbose debug output")
 	app.ParseFlags([]string{})
 	return app
 }
 
-func (o *Options) parseBuildEnvArgs() *cobra.Command {
+func (o *Options) validateOperatingParameters() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "validate-operating-parameters",
+		Short: "for use by scripts for closed-loop communication: exits gracefully if provided arguments match computed values, exits with error otherwise",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return ingest.ValidateOperatingParameters(args, o.BuildRun.Config.ComputedBuildVars)
+		},
+	}
+	return cmd
+}
+func (o *Options) reportComputedValues() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "parse-env",
 		Short: "read environment variables and return corresponding build values",
@@ -95,7 +107,7 @@ func (o *Options) reportRelease() *cobra.Command {
 		Short: "reports if a build is a release build",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cbv := o.BuildRun.Config.ComputedBuildVars
-			contextutils.CliLogInfow(o.Internal.ctx, stringForBoolToEnv(cbv.Release), "config", cbv)
+			contextutils.CliLogInfow(o.Internal.ctx, envutils.StringForBoolToEnv(cbv.Release), "config", cbv)
 			return nil
 		},
 	}
@@ -139,11 +151,4 @@ func (o *Options) reportVersion() *cobra.Command {
 		},
 	}
 	return cmd
-}
-
-func stringForBoolToEnv(b bool) string {
-	if b {
-		return constants.PrintEnvTrue
-	}
-	return constants.PrintEnvFalse
 }

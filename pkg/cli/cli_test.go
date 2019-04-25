@@ -46,7 +46,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  constants.PrintEnvTrue,
+			consoleLogOut:  constants.PrintEnvTrue + "\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get release version",
@@ -56,7 +56,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "1.2.3",
+			consoleLogOut:  "1.2.3\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get non-release version",
@@ -66,7 +66,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "1234",
+			consoleLogOut:  "1234\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get container prefix for release",
@@ -76,7 +76,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "quay.io/solo-io",
+			consoleLogOut:  "quay.io/solo-io\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get container prefix for test",
@@ -86,7 +86,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "gcr.io/solo-projects",
+			consoleLogOut:  "gcr.io/solo-projects\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get version for release",
@@ -96,7 +96,7 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "1.2.3",
+			consoleLogOut:  "1.2.3\n",
 			consoleLogErr:  "",
 		}, {
 			description:    "should get version for test",
@@ -106,7 +106,37 @@ var _ = Describe("build cli", func() {
 			configFileName: confFilename,
 			cobraOut:       "",
 			cobraErr:       "",
-			consoleLogOut:  "1234",
+			consoleLogOut:  "1234\n",
+			consoleLogErr:  "",
+		}, {
+			description:    "should validate without error",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects 1234",
+			buildId:        "1234",
+			taggedVersion:  "",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "",
+			consoleLogOut:  "",
+			consoleLogErr:  "",
+		}, {
+			description:    "should validate with omission error",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects",
+			buildId:        "1234",
+			taggedVersion:  "",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "Error: expected 4 arguments, received 3",
+			consoleLogOut:  "",
+			consoleLogErr:  "",
+		}, {
+			description:    "should validate with value error",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-projects 454545",
+			buildId:        "1234",
+			taggedVersion:  "",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "Error: image tag wants: 1234, got: 454545",
+			consoleLogOut:  "",
 			consoleLogErr:  "",
 		}}
 		It("should handle parse-env cases", func() {
@@ -117,8 +147,8 @@ var _ = Describe("build cli", func() {
 				os.Setenv(constants.EnvVarConfigFileName, tc.configFileName)
 				out := appWithLoggerOutput(tc.args)
 				Expect(out.CobraStdout).To(Equal(tc.cobraOut))
-				Expect(out.CobraStderr).To(Equal(tc.cobraErr))
-				Expect(out.LoggerConsoleStout).To(Equal(fmt.Sprintln(tc.consoleLogOut)))
+				Expect(out.CobraStderr).To(MatchRegexp(tc.cobraErr))
+				Expect(out.LoggerConsoleStout).To(Equal(tc.consoleLogOut))
 				Expect(out.LoggerConsoleStderr).To(Equal(tc.consoleLogErr))
 			}
 		})
