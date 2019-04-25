@@ -190,6 +190,8 @@ github.com/solo-io/go-utils v0.7.15 h1:SPp9974zAjJh5pHq9dBpdVR44DLAaahRWpc9OMrbH
 github.com/solo-io/go-utils v0.7.15/go.mod h1:bHCfnyOcm+P9PXv3d3yt/EOiehQV74MvnXqz7Q3kMPs=
 github.com/solo-io/go-utils v0.7.17-0.20190424214930-015705a1de53 h1:SO1uMthqINKXhHkz7GvYj4URcBaT0dJgA7ORTB2Fhfo=
 github.com/solo-io/go-utils v0.7.17-0.20190424214930-015705a1de53/go.mod h1:k1iD/HGY3qLKNAm+scsyywtOtsF2NgT9p01tvO7NCgY=
+github.com/solo-io/go-utils v0.7.17 h1:Tb9c/wM8kQ/D5yF+Efsfc/pZhHb2Ugxs2lR/0cENB/g=
+github.com/solo-io/go-utils v0.7.17/go.mod h1:k1iD/HGY3qLKNAm+scsyywtOtsF2NgT9p01tvO7NCgY=
 github.com/solo-io/solo-kit v0.6.3/go.mod h1:oBaQ6tOwuO97u7w+s3TeI08YLHcbiWemInx0XkDfKFw=
 github.com/spf13/afero v1.2.1/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
 github.com/spf13/cobra v0.0.3 h1:ZlrZ4XsMRm04Fr5pSFxBgfND2EBVa1nLpiy1stUsX/8=
