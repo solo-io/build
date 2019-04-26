@@ -4,7 +4,7 @@ changelog:
   issueLink: https://github.com/solo-io/build/issues/5
 - type: NEW_FEATURE
   description: >
-    Enhancements for convenience and useage as a library:
+    Enhancements for convenience and usage as a library:
     - Allow filename to be passed from a flag
     - Allow filename and env var overrides to be passed to InitializeBuildRun
   issueLink: https://github.com/solo-io/build/issues/4
