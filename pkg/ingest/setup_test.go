@@ -75,8 +75,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -96,8 +96,8 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -113,8 +113,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -140,8 +140,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -153,9 +153,9 @@ var _ = Describe("ingest config", func() {
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = "gcr.io"
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectName = ""
+			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectId = ""
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
-			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectName = "aproject"
+			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectId = "aproject"
 			Expect(setContainerPrefix(&prefix, release, config)).NotTo(HaveOccurred())
 		})
 		It("should validate quay container specs correctly", func() {

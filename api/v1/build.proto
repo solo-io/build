@@ -121,7 +121,9 @@ message DockerHubRegistry {
 
 message GoogleContainerRegistry {
     string base_url = 1;
-    string project_name = 2;
+    // The unique id of your Google Cloud project. Note that project id usually differs from project name.
+    // https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects
+    string project_id = 2;
 }
 
 //message TestRun {

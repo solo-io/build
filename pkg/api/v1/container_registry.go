@@ -39,9 +39,9 @@ func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
 	if x.Gcr.BaseUrl == "" {
 		return fmt.Errorf("must provide a base url for gcr repos")
 	}
-	if x.Gcr.ProjectName == "" {
+	if x.Gcr.ProjectId == "" {
 		return fmt.Errorf("must provide a project name for gcr repos")
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.Gcr.BaseUrl, x.Gcr.ProjectName)
+	*prefix = fmt.Sprintf("%s/%s", x.Gcr.BaseUrl, x.Gcr.ProjectId)
 	return nil
 }
