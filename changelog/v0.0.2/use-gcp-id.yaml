@@ -1,0 +1,4 @@
+changelog:
+- type: FIX
+  description: GCR operations use project_id instead of project_name to conform to gcp api.
+  issueLink: https://github.com/solo-io/build/issues/5
