@@ -82,7 +82,6 @@ func resolveBuildEnvVars(explicitBuildEnvVars *v1.BuildEnvVars) *v1.BuildEnvVars
 		TaggedVersion: explicitBuildEnvVars.TaggedVersion,
 	}
 	if explicitBuildEnvVars.BuildId == "" {
-		panic("oo")
 		ev.BuildId = os.Getenv(constants.EnvBuildId)
 	}
 	if explicitBuildEnvVars.TaggedVersion == "" {

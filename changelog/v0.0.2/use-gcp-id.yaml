@@ -2,3 +2,9 @@ changelog:
 - type: FIX
   description: GCR operations use project_id instead of project_name to conform to gcp api.
   issueLink: https://github.com/solo-io/build/issues/5
+- type: NEW_FEATURE
+  description: >
+  Enhancements for convenience and useage as a library:
+  - Allow filename to be passed from a flag
+  - Allow filename and env var overrides to be passed to InitializeBuildRun
+  issueLink: https://github.com/solo-io/build/issues/4
