@@ -3,8 +3,8 @@ package ingest
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gstruct"
 	v1 "github.com/solo-io/build/pkg/api/v1"
+	"github.com/solo-io/build/test/testutils"
 )
 
 var _ = Describe("ingest config", func() {
@@ -16,7 +16,7 @@ var _ = Describe("ingest config", func() {
 		BuildId:       buildId,
 		TaggedVersion: nonReleaseTagValue,
 	}
-	var sampleConfigIngested = v1.BuildRun{
+	var expectedBuildRunValues = v1.BuildRun{
 		Spec: &v1.BuildSpec{
 			Config: &v1.BuildConfig{
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
@@ -51,7 +51,7 @@ var _ = Describe("ingest config", func() {
 		},
 	}
 
-	Context("InitializeBuildRun", func() {
+	FContext("InitializeBuildRun", func() {
 		It("should fallback to default filename when no file specified and env var not set", func() {
 			br, err := InitializeBuildRun("", &v1.BuildEnvVars{})
 			Expect(err).To(HaveOccurred())
@@ -61,34 +61,7 @@ var _ = Describe("ingest config", func() {
 		It("should read from file when provided", func() {
 			br, err := InitializeBuildRun(relativePathToSampleConfig, explicitBuildEnvVars)
 			Expect(err).ToNot(HaveOccurred())
-
-			// aside on matching large structs
-			// Gomega has MatchAllFields, but it requires you to fill in everything, including the XXXabcd fields made by protoc
-			// An alternative is to pass IgnoreExtras with MatchFields
-			// Either way, you have to write out a lot of stuff by hand
-			// This is worthwhile in some cases because you can be explicit about how fields should match and you get
-			// great, scoped feedback on errors
-			Expect(br).To(MatchFields(IgnoreExtras, Fields{
-				"Spec": PointTo(MatchFields(IgnoreExtras, Fields{
-					"Config": PointTo(MatchFields(IgnoreExtras, Fields{
-						"ReleaseContainerRegistry": PointTo(MatchFields(IgnoreExtras, Fields{
-							"Registry": PointTo(MatchFields(IgnoreExtras, Fields{
-								"Quay": PointTo(MatchFields(IgnoreExtras, Fields{
-									"BaseUrl":      Equal("quay.io"),
-									"Organization": Equal("solo-io"),
-								})),
-							})),
-						})),
-					})),
-				})),
-			}))
-			// It is much easier to do this - stringify the struct
-			// One shortcoming is that you only get +/- 5 chars of context
-			// per: https://github.com/onsi/gomega/blob/master/format/format.go#L146
-			// TODO(mitchdraft) gomega pr to modify charactersAroundMismatchToInclude (if not merged will make a util)
-			Expect(br.String()).To(Equal(sampleConfigIngested.String()))
-			// This was my first thought, but the error message is not human friendly, you have to compare large blocks of text
-			Expect(br).To(Equal(sampleConfigIngested))
+			testutils.ExpectEqualProtoMessages(&br, &expectedBuildRunValues)
 		})
 	})
 	Context("unit test isRelease", func() {
