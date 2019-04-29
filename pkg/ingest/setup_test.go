@@ -51,7 +51,7 @@ var _ = Describe("ingest config", func() {
 		},
 	}
 
-	FContext("InitializeBuildRun", func() {
+	Context("InitializeBuildRun", func() {
 		It("should fallback to default filename when no file specified and env var not set", func() {
 			br, err := InitializeBuildRun("", &v1.BuildEnvVars{})
 			Expect(err).To(HaveOccurred())
