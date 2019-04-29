@@ -2,6 +2,9 @@ package cli
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/solo-io/build/pkg/constants"
 
 	"github.com/pkg/errors"
 
@@ -29,7 +32,8 @@ type Internal struct {
 	ctx context.Context
 }
 type Input struct {
-	Debug bool
+	Debug          bool
+	ConfigFilename string
 }
 
 var AppConfig = clicore.CommandConfig{
@@ -54,7 +58,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 		Short:   "CLI for solo.io's build tool",
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			buildRun, err := ingest.InitializeBuildRun()
+			buildRun, err := ingest.InitializeBuildRun("", &v1.BuildEnvVars{})
 			if err != nil {
 				return err
 			}
@@ -75,6 +79,7 @@ func App(ctx context.Context, version string) *cobra.Command {
 		o.validateOperatingParameters(),
 	)
 	app.PersistentFlags().BoolVar(&o.Input.Debug, "debug", false, "enable verbose debug output")
+	app.PersistentFlags().StringVarP(&o.Input.ConfigFilename, "config-file", "c", "", fmt.Sprintf("path to project config file. Optional, overrides env var %v, which overrides default %v", constants.EnvVarConfigFileName, constants.DefaultConfigFileName))
 	return app
 }
 

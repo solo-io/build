@@ -1,9 +1,12 @@
 package ingest
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/solo-io/go-utils/contextutils"
 
 	"github.com/pkg/errors"
 	"github.com/solo-io/go-utils/versionutils"
@@ -13,12 +16,12 @@ import (
 	"github.com/solo-io/go-utils/protoutils"
 )
 
-func InitializeBuildRun() (v1.BuildRun, error) {
-	buildSpec, err := parseSpec()
+func InitializeBuildRun(configFilename string, explicitBuildEnvVars *v1.BuildEnvVars) (v1.BuildRun, error) {
+	buildSpec, err := parseSpec(configFilename)
 	if err != nil {
 		return v1.BuildRun{}, err
 	}
-	buildRunConfig, err := getBuildRunConfigFromEnv(buildSpec)
+	buildRunConfig, err := getBuildRunConfig(buildSpec, explicitBuildEnvVars)
 	if err != nil {
 		return v1.BuildRun{}, err
 	}
@@ -29,16 +32,19 @@ func InitializeBuildRun() (v1.BuildRun, error) {
 }
 
 // uses a config filename from env or default, in that order
-func parseSpec() (*v1.BuildSpec, error) {
-	filename := ""
-	spec := &v1.BuildSpec{}
-	envFile := os.Getenv(constants.EnvVarConfigFileName)
-	if envFile != "" {
-		filename = envFile
-	} else {
-		filename = constants.DefaultConfigFileName
+func parseSpec(filename string) (*v1.BuildSpec, error) {
+	if filename == "" {
+		contextutils.LoggerFrom(context.TODO()).Debugw("project filename not provided, checking env")
+		envFile := os.Getenv(constants.EnvVarConfigFileName)
+		if envFile != "" {
+			filename = envFile
+		} else {
+			contextutils.LoggerFrom(context.TODO()).Debugw("project filename env var not found, using default filename")
+			filename = constants.DefaultConfigFileName
+		}
 	}
 	b, err := ioutil.ReadFile(filename)
+	spec := &v1.BuildSpec{}
 	if err != nil {
 		return spec, errors.Wrapf(err, "could not parse build spec")
 	}
@@ -48,10 +54,8 @@ func parseSpec() (*v1.BuildSpec, error) {
 	return spec, nil
 }
 
-func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
-	ev := &v1.BuildEnvVars{}
-	ev.BuildId = os.Getenv(constants.EnvBuildId)
-	ev.TaggedVersion = os.Getenv(constants.EnvTagVersion)
+func getBuildRunConfig(spec *v1.BuildSpec, explicitBuildEnvVars *v1.BuildEnvVars) (v1.BuildRunConfig, error) {
+	ev := resolveBuildEnvVars(explicitBuildEnvVars)
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
 	var err error
@@ -69,6 +73,21 @@ func getBuildRunConfigFromEnv(spec *v1.BuildSpec) (v1.BuildRunConfig, error) {
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,
 	}, nil
+}
+
+func resolveBuildEnvVars(explicitBuildEnvVars *v1.BuildEnvVars) *v1.BuildEnvVars {
+	// copy values, if any
+	ev := &v1.BuildEnvVars{
+		BuildId:       explicitBuildEnvVars.BuildId,
+		TaggedVersion: explicitBuildEnvVars.TaggedVersion,
+	}
+	if explicitBuildEnvVars.BuildId == "" {
+		ev.BuildId = os.Getenv(constants.EnvBuildId)
+	}
+	if explicitBuildEnvVars.TaggedVersion == "" {
+		ev.TaggedVersion = os.Getenv(constants.EnvTagVersion)
+	}
+	return ev
 }
 
 func getVersion(release bool, taggedVersion, buildId string) (string, error) {

@@ -43,8 +43,8 @@ var _ = Describe("container registry", func() {
 		cr := ContainerRegistry{
 			Registry: &ContainerRegistry_Gcr{
 				Gcr: &GoogleContainerRegistry{
-					ProjectName: "myproject",
-					BaseUrl:     baseGcrUrl,
+					ProjectId: "myproject",
+					BaseUrl:   baseGcrUrl,
 				},
 			},
 		}

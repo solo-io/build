@@ -4,10 +4,66 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	v1 "github.com/solo-io/build/pkg/api/v1"
+	"github.com/solo-io/build/test/testutils"
 )
 
 var _ = Describe("ingest config", func() {
 
+	const relativePathToSampleConfig = "../../examples/sample-solo-project.yaml"
+	var buildId = "some-build-id"
+	const nonReleaseTagValue = ""
+	var explicitBuildEnvVars = &v1.BuildEnvVars{
+		BuildId:       buildId,
+		TaggedVersion: nonReleaseTagValue,
+	}
+	var expectedBuildRunValues = v1.BuildRun{
+		Spec: &v1.BuildSpec{
+			Config: &v1.BuildConfig{
+				ReleaseContainerRegistry: &v1.ContainerRegistry{
+					Registry: &v1.ContainerRegistry_Quay{
+						Quay: &v1.QuayRegistry{
+							BaseUrl:      "quay.io",
+							Organization: "solo-io",
+						},
+					},
+				},
+				TestContainerRegistry: &v1.ContainerRegistry{
+					Registry: &v1.ContainerRegistry_Gcr{
+						Gcr: &v1.GoogleContainerRegistry{
+							BaseUrl:   "gcr.io",
+							ProjectId: "solo-public-1010",
+						},
+					},
+				},
+			},
+		},
+		Config: &v1.BuildRunConfig{
+			BuildEnvVars: &v1.BuildEnvVars{
+				BuildId:       buildId,
+				TaggedVersion: nonReleaseTagValue,
+			},
+			ComputedBuildVars: &v1.ComputedBuildVars{
+				Release:         false,
+				ImageTag:        buildId,
+				ContainerPrefix: "gcr.io/solo-public-1010",
+				Version:         buildId,
+			},
+		},
+	}
+
+	Context("InitializeBuildRun", func() {
+		It("should fallback to default filename when no file specified and env var not set", func() {
+			br, err := InitializeBuildRun("", &v1.BuildEnvVars{})
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("could not parse build spec: open solo-project.yaml: no such file or directory"))
+			Expect(br).To(Equal(v1.BuildRun{}))
+		})
+		It("should read from file when provided", func() {
+			br, err := InitializeBuildRun(relativePathToSampleConfig, explicitBuildEnvVars)
+			Expect(err).ToNot(HaveOccurred())
+			testutils.ExpectEqualProtoMessages(&br, &expectedBuildRunValues)
+		})
+	})
 	Context("unit test isRelease", func() {
 		It("should report release correctly", func() {
 			ev1 := &v1.BuildEnvVars{
@@ -75,8 +131,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -96,8 +152,8 @@ var _ = Describe("ingest config", func() {
 				TestContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -113,8 +169,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -140,8 +196,8 @@ var _ = Describe("ingest config", func() {
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_Gcr{
 						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:     "gcr.io",
-							ProjectName: "aproject",
+							BaseUrl:   "gcr.io",
+							ProjectId: "aproject",
 						},
 					},
 				},
@@ -153,9 +209,9 @@ var _ = Describe("ingest config", func() {
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = "gcr.io"
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectName = ""
+			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectId = ""
 			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
-			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectName = "aproject"
+			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectId = "aproject"
 			Expect(setContainerPrefix(&prefix, release, config)).NotTo(HaveOccurred())
 		})
 		It("should validate quay container specs correctly", func() {
