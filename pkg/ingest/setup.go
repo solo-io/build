@@ -69,6 +69,9 @@ func getBuildRunConfig(spec *v1.BuildSpec, explicitBuildEnvVars *v1.BuildEnvVars
 	if err := setContainerPrefix(&cv.ContainerPrefix, cv.Release, spec.Config); err != nil {
 		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set container prefix")
 	}
+	if err := setHelmRepository(&cv.HelmRepository, cv.Release, spec.Config); err != nil {
+		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set helm chart repository")
+	}
 	return v1.BuildRunConfig{
 		BuildEnvVars:      ev,
 		ComputedBuildVars: cv,
@@ -137,5 +140,25 @@ func setContainerPrefix(prefix *string, isRelease bool, config *v1.BuildConfig) 
 	if err := targetRegistry.SetPrefixFromContainerRegistry(prefix); err != nil {
 		return errors.Wrapf(err, "could not set container prefix")
 	}
+	return nil
+}
+
+func setHelmRepository(repository *string, isRelease bool, config *v1.BuildConfig) error {
+	if config.ReleaseHelmRepository == nil {
+		return fmt.Errorf("must provide a release_helm_repository")
+	}
+	if config.TestHelmRepository == nil {
+		return fmt.Errorf("must provide a test_helm_repository")
+	}
+	targetRepo := config.TestHelmRepository
+	if isRelease {
+		targetRepo = config.ReleaseHelmRepository
+	}
+	// Currently the only supported repo type is GCS
+	gcs := targetRepo.GetGoogleCloudStorage()
+	if gcs == nil {
+		return fmt.Errorf("unexpected helm repository type %T. We currently only support Google Cloud Storage", targetRepo)
+	}
+	*repository = gcs.BucketUrl
 	return nil
 }
