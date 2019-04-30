@@ -20,5 +20,5 @@ func ExpectEqualProtoMessages(a, b proto.Message) {
 	// One shortcoming is that you only get +/- 5 chars of context
 	// per: https://github.com/onsi/gomega/blob/master/format/format.go#L146
 	// TODO(mitchdraft) gomega pr to modify charactersAroundMismatchToInclude (if not merged will make a util)
-	ExpectWithOffset(1, a.String()).To(Equal(b.String()))
+	Expect(a.String()).To(Equal(b.String()))
 }
