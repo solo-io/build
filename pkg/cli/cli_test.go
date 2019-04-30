@@ -109,8 +109,28 @@ var _ = Describe("build cli", func() {
 			consoleLogOut:  "1234\n",
 			consoleLogErr:  "",
 		}, {
+			description:    "should get helm repo for release",
+			args:           "parse-env helm-repo",
+			buildId:        "1234",
+			taggedVersion:  "v1.2.3",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "",
+			consoleLogOut:  "gs://solo-helm/\n",
+			consoleLogErr:  "",
+		}, {
+			description:    "should get helm repo for test",
+			args:           "parse-env helm-repo",
+			buildId:        "1234",
+			taggedVersion:  "",
+			configFileName: confFilename,
+			cobraOut:       "",
+			cobraErr:       "",
+			consoleLogOut:  "gs://solo-helm-test/\n",
+			consoleLogErr:  "",
+		}, {
 			description:    "should validate without error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 1234",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 1234 gs://solo-helm-test/",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
@@ -120,17 +140,17 @@ var _ = Describe("build cli", func() {
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with omission error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 ",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
 			cobraOut:       "",
-			cobraErr:       "Error: did not receive the expected computed variables: expected 4 arguments, received 3",
+			cobraErr:       "Error: did not receive the expected computed variables: expected 5 arguments, received 4",
 			consoleLogOut:  "",
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with value error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 454545",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 454545 gs://solo-helm-test/",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
@@ -147,7 +167,7 @@ var _ = Describe("build cli", func() {
 				Expect(os.Setenv(constants.EnvVarConfigFileName, tc.configFileName)).NotTo(HaveOccurred())
 				out := appWithLoggerOutput(tc.args)
 				Expect(out.CobraStdout).To(Equal(tc.cobraOut))
-				Expect(out.CobraStderr).To(MatchRegexp(tc.cobraErr))
+				Expect(out.CobraStderr).To(ContainSubstring(tc.cobraErr))
 				Expect(out.LoggerConsoleStout).To(Equal(tc.consoleLogOut))
 				Expect(out.LoggerConsoleStderr).To(Equal(tc.consoleLogErr))
 			}

@@ -96,7 +96,8 @@ func (o *Options) reportComputedValues() *cobra.Command {
 		o.reportRelease(),
 		o.reportImageTag(),
 		o.reportContainerPrefix(),
-		o.reportVersion())
+		o.reportVersion(),
+		o.reportHelmRepo())
 	return cmd
 }
 
@@ -146,6 +147,19 @@ func (o *Options) reportVersion() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cbv := o.BuildRun.Config.ComputedBuildVars
 			contextutils.CliLogInfow(o.Internal.ctx, cbv.Version, "config", cbv)
+			return nil
+		},
+	}
+	return cmd
+}
+
+func (o *Options) reportHelmRepo() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "helm-repo",
+		Short: "reports the URI of the Google Cloud Storage bucket the helm chart resulting from this build will be pushed to",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cbv := o.BuildRun.Config.ComputedBuildVars
+			contextutils.CliLogInfow(o.Internal.ctx, cbv.HelmRepository, "config", cbv)
 			return nil
 		},
 	}
