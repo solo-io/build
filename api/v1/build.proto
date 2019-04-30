@@ -31,6 +31,8 @@ message ComputedBuildVars {
     // during a release, matches the semver tag
     // during a test build, matches the build id
     string version = 4;
+    // the URI of the repository to be used to publish the helm charts for this build, e.g. gs://supergloo-helm/
+    string helm_repository = 5;
 }
 
 //message GcloudConfig {
@@ -99,6 +101,12 @@ message BuildConfig {
     ContainerRegistry release_container_registry = 20;
     // optional, if not provided, will use the same registry for release and test
     ContainerRegistry test_container_registry = 21;
+
+    // target helm repo for release builds
+    HelmChartRepository release_helm_repository = 30;
+    // target helm repo for non-release builds
+    HelmChartRepository test_helm_repository = 31;
+
 }
 
 message ContainerRegistry {
@@ -124,6 +132,16 @@ message GoogleContainerRegistry {
     // The unique id of your Google Cloud project. Note that project id usually differs from project name.
     // https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects
     string project_id = 2;
+}
+
+message HelmChartRepository {
+    oneof repository_type {
+        GoogleCloudStorage google_cloud_storage = 11;
+    }
+}
+
+message GoogleCloudStorage {
+    string bucket_url = 1;
 }
 
 //message TestRun {

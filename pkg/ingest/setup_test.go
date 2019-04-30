@@ -35,6 +35,20 @@ var _ = Describe("ingest config", func() {
 						},
 					},
 				},
+				ReleaseHelmRepository: &v1.HelmChartRepository{
+					RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
+						GoogleCloudStorage: &v1.GoogleCloudStorage{
+							BucketUrl: "gs://solo-helm/",
+						},
+					},
+				},
+				TestHelmRepository: &v1.HelmChartRepository{
+					RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
+						GoogleCloudStorage: &v1.GoogleCloudStorage{
+							BucketUrl: "gs://solo-helm-test/",
+						},
+					},
+				},
 			},
 		},
 		Config: &v1.BuildRunConfig{
@@ -47,6 +61,7 @@ var _ = Describe("ingest config", func() {
 				ImageTag:        buildId,
 				ContainerPrefix: "gcr.io/solo-public-1010",
 				Version:         buildId,
+				HelmRepository:  "gs://solo-helm-test/",
 			},
 		},
 	}

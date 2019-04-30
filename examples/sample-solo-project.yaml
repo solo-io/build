@@ -7,4 +7,9 @@ config:
     gcr:
       base_url: gcr.io
       project_id: solo-public-1010
-
+  release_helm_repository:
+    google_cloud_storage:
+      bucket_url: gs://solo-helm/
+  test_helm_repository:
+    google_cloud_storage:
+      bucket_url: gs://solo-helm-test/
