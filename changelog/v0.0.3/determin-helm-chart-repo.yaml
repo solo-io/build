@@ -1,0 +1,9 @@
+changelog:
+- type: NEW_FEATURE
+  description: |
+    Added two fields to the build spec:
+    * `release_helm_repository`: target helm repo for release builds
+    * `test_helm_repository`: target helm repo for other builds
+
+    The new `parse-env helm-repo` sub-command will return the appropriate value depending on the build context.
+  issueLink: https://github.com/solo-io/build/issues/8

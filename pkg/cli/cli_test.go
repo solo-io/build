@@ -140,12 +140,12 @@ var _ = Describe("build cli", func() {
 			consoleLogErr:  "",
 		}, {
 			description:    "should validate with omission error",
-			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010 ",
+			args:           "validate-operating-parameters FALSE 1234 gcr.io/solo-public-1010",
 			buildId:        "1234",
 			taggedVersion:  "",
 			configFileName: confFilename,
 			cobraOut:       "",
-			cobraErr:       "Error: did not receive the expected computed variables: expected 5 arguments, received 4",
+			cobraErr:       "Error: did not receive the expected computed variables: expected 5 arguments, received 3",
 			consoleLogOut:  "",
 			consoleLogErr:  "",
 		}, {
