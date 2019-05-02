@@ -17,16 +17,19 @@ func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error
 	}
 }
 
-const dockerRepoUrl = "docker.io"
-
+const (
+	DockerBaseUrl = "docker.io"
+	QuayBaseUrl = "quay.io"
+	GcrBaseUrl = "gcr.io"
+)
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {
-	*prefix = dockerRepoUrl
+	*prefix = DockerBaseUrl
 	return nil
 }
 
 func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
 	if x.Quay.BaseUrl == "" {
-		return fmt.Errorf("must provide a base url for quay repos")
+		x.Quay.BaseUrl = QuayBaseUrl
 	}
 	if x.Quay.Organization == "" {
 		return fmt.Errorf("must provide an organization for quay repos")
@@ -37,7 +40,7 @@ func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
 
 func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
 	if x.Gcr.BaseUrl == "" {
-		return fmt.Errorf("must provide a base url for gcr repos")
+		x.Gcr.BaseUrl = GcrBaseUrl
 	}
 	if x.Gcr.ProjectId == "" {
 		return fmt.Errorf("must provide a project name for gcr repos")

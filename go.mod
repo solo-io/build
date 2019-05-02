@@ -9,6 +9,4 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/solo-io/go-utils v0.7.17
 	github.com/spf13/cobra v0.0.3
-	go.uber.org/zap v1.9.1
-	k8s.io/helm v2.13.0+incompatible
 )

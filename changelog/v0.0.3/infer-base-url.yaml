@@ -1,0 +1,4 @@
+changelog:
+  - type: NEW_FEATURE
+    description: Default base urls are now used for Google Container Registry (gcr.io) and Quay (quay.io) if not specified.
+    issueLink: 
