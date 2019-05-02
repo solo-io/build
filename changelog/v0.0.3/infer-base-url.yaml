@@ -1,4 +1,7 @@
 changelog:
   - type: NEW_FEATURE
     description: Default base urls are now used for Google Container Registry (gcr.io) and Quay (quay.io) if not specified.
-    issueLink:
+    issueLink: https://github.com/solo-io/build/issues/11
+  - type: FIX
+    description: Docker container registry is now configured with a base URL and org name, like Quay.
+    issueLink: https://github.com/solo-io/build/issues/3

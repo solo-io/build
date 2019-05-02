@@ -15,17 +15,66 @@ var _ = Describe("container registry", func() {
 		prefix = ""
 	})
 
-	It("should handle docker", func() {
-		cr := ContainerRegistry{
-			Registry: &ContainerRegistry_DockerHub{},
-		}
-		Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
-		Expect(prefix).To(Equal(DockerBaseUrl))
+	Context("docker", func() {
+		orgName := "myorg"
+
+		It("should error if oneof is empty", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_DockerHub{},
+			}
+			err := cr.SetPrefixFromContainerRegistry(&prefix)
+			Expect(err).To(BeEquivalentTo(NoDockerOrgSpecifiedError))
+		})
+
+		It("should error if orgName not specified", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_DockerHub{
+					DockerHub: &DockerHubRegistry{},
+				},
+			}
+			err := cr.SetPrefixFromContainerRegistry(&prefix)
+			Expect(err).To(BeEquivalentTo(NoDockerOrgSpecifiedError))
+		})
+
+		It("should handle docker without base url", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_DockerHub{
+					DockerHub: &DockerHubRegistry{
+						Organization: orgName,
+					},
+				},
+			}
+			Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
+			Expect(prefix).To(Equal("docker.io/myorg"))
+		})
+
+		It("should handle docker with specified base url", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_DockerHub{
+					DockerHub: &DockerHubRegistry{
+						BaseUrl: "other.docker.io",
+						Organization: orgName,
+					},
+				},
+			}
+			Expect(cr.SetPrefixFromContainerRegistry(&prefix)).NotTo(HaveOccurred())
+			Expect(prefix).To(Equal("other.docker.io/myorg"))
+		})
 	})
+
+
 
 	Context("quay", func() {
 
 		orgName := "myorg"
+
+		It("should error if oneof is empty", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_Quay{},
+			}
+			err := cr.SetPrefixFromContainerRegistry(&prefix)
+			Expect(err).To(BeEquivalentTo(NoQuayOrgSpecifiedError))
+		})
 
 		It("should error if orgName not specified", func() {
 			cr := ContainerRegistry{
@@ -67,6 +116,14 @@ var _ = Describe("container registry", func() {
 	Context("gcr", func() {
 
 		projectId := "myproject"
+
+		It("should error if oneof is empty", func() {
+			cr := ContainerRegistry{
+				Registry: &ContainerRegistry_Gcr{},
+			}
+			err := cr.SetPrefixFromContainerRegistry(&prefix)
+			Expect(err).To(BeEquivalentTo(NoGcrProjectIdSpecifiedError))
+		})
 
 		It("should error if projectId not specified", func() {
 			cr := ContainerRegistry{

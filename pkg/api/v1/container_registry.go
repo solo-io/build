@@ -19,6 +19,7 @@ func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error
 }
 
 var (
+	NoDockerOrgSpecifiedError = errors.Errorf("must provide an organization for docker repos")
 	NoQuayOrgSpecifiedError = errors.Errorf("must provide an organization for quay repos")
 	NoGcrProjectIdSpecifiedError = errors.Errorf("must provide a project id for gcr repos")
 )
@@ -30,11 +31,23 @@ const (
 )
 
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {
-	*prefix = DockerBaseUrl
+	if x.DockerHub == nil {
+		x.DockerHub = &DockerHubRegistry{}
+	}
+	if x.DockerHub.BaseUrl == "" {
+		x.DockerHub.BaseUrl = DockerBaseUrl
+	}
+	if x.DockerHub.Organization == "" {
+		return NoDockerOrgSpecifiedError
+	}
+	*prefix = fmt.Sprintf("%s/%s", x.DockerHub.BaseUrl, x.DockerHub.Organization)
 	return nil
 }
 
 func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
+	if x.Quay == nil {
+		x.Quay = &QuayRegistry{}
+	}
 	if x.Quay.BaseUrl == "" {
 		x.Quay.BaseUrl = QuayBaseUrl
 	}
@@ -46,6 +59,9 @@ func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
 }
 
 func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
+	if x.Gcr == nil {
+		x.Gcr = &GoogleContainerRegistry{}
+	}
 	if x.Gcr.BaseUrl == "" {
 		x.Gcr.BaseUrl = GcrBaseUrl
 	}
