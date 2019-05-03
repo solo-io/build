@@ -31,43 +31,37 @@ const (
 )
 
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {
-	if x.DockerHub == nil {
-		x.DockerHub = &DockerHubRegistry{}
+	base, org := x.DockerHub.GetBaseUrl(), x.DockerHub.GetOrganization()
+	if base == "" {
+		base = DockerBaseUrl
 	}
-	if x.DockerHub.BaseUrl == "" {
-		x.DockerHub.BaseUrl = DockerBaseUrl
-	}
-	if x.DockerHub.Organization == "" {
+	if org == "" {
 		return NoDockerOrgSpecifiedError
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.DockerHub.BaseUrl, x.DockerHub.Organization)
+	*prefix = fmt.Sprintf("%s/%s", base, org)
 	return nil
 }
 
 func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
-	if x.Quay == nil {
-		x.Quay = &QuayRegistry{}
+	base, org := x.Quay.GetBaseUrl(), x.Quay.GetOrganization()
+	if base == "" {
+		base = QuayBaseUrl
 	}
-	if x.Quay.BaseUrl == "" {
-		x.Quay.BaseUrl = QuayBaseUrl
-	}
-	if x.Quay.Organization == "" {
+	if org == "" {
 		return NoQuayOrgSpecifiedError
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.Quay.BaseUrl, x.Quay.Organization)
+	*prefix = fmt.Sprintf("%s/%s", base, org)
 	return nil
 }
 
 func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
-	if x.Gcr == nil {
-		x.Gcr = &GoogleContainerRegistry{}
+	base, proj := x.Gcr.GetBaseUrl(), x.Gcr.GetProjectId()
+	if base == "" {
+		base = GcrBaseUrl
 	}
-	if x.Gcr.BaseUrl == "" {
-		x.Gcr.BaseUrl = GcrBaseUrl
-	}
-	if x.Gcr.ProjectId == "" {
+	if proj == "" {
 		return NoGcrProjectIdSpecifiedError
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.Gcr.BaseUrl, x.Gcr.ProjectId)
+	*prefix = fmt.Sprintf("%s/%s", base, proj)
 	return nil
 }

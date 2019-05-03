@@ -16,55 +16,57 @@ var _ = Describe("ingest config", func() {
 		BuildId:       buildId,
 		TaggedVersion: nonReleaseTagValue,
 	}
-	var expectedBuildRunValues = v1.BuildRun{
-		Spec: &v1.BuildSpec{
-			Config: &v1.BuildConfig{
-				ReleaseContainerRegistry: &v1.ContainerRegistry{
-					Registry: &v1.ContainerRegistry_Quay{
-						Quay: &v1.QuayRegistry{
-							BaseUrl:      "quay.io",
-							Organization: "solo-io",
+	var expectedBuildRunValues v1.BuildRun
+
+	BeforeEach(func() {
+		expectedBuildRunValues = v1.BuildRun{
+			Spec: &v1.BuildSpec{
+				Config: &v1.BuildConfig{
+					ReleaseContainerRegistry: &v1.ContainerRegistry{
+						Registry: &v1.ContainerRegistry_Quay{
+							Quay: &v1.QuayRegistry{
+								Organization: "solo-io",
+							},
 						},
 					},
-				},
-				TestContainerRegistry: &v1.ContainerRegistry{
-					Registry: &v1.ContainerRegistry_Gcr{
-						Gcr: &v1.GoogleContainerRegistry{
-							BaseUrl:   "gcr.io",
-							ProjectId: "solo-public-1010",
+					TestContainerRegistry: &v1.ContainerRegistry{
+						Registry: &v1.ContainerRegistry_Gcr{
+							Gcr: &v1.GoogleContainerRegistry{
+								ProjectId: "solo-public-1010",
+							},
 						},
 					},
-				},
-				ReleaseHelmRepository: &v1.HelmChartRepository{
-					RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
-						GoogleCloudStorage: &v1.GoogleCloudStorage{
-							BucketUrl: "gs://solo-helm/",
+					ReleaseHelmRepository: &v1.HelmChartRepository{
+						RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
+							GoogleCloudStorage: &v1.GoogleCloudStorage{
+								BucketUrl: "gs://solo-helm/",
+							},
 						},
 					},
-				},
-				TestHelmRepository: &v1.HelmChartRepository{
-					RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
-						GoogleCloudStorage: &v1.GoogleCloudStorage{
-							BucketUrl: "gs://solo-helm-test/",
+					TestHelmRepository: &v1.HelmChartRepository{
+						RepositoryType: &v1.HelmChartRepository_GoogleCloudStorage{
+							GoogleCloudStorage: &v1.GoogleCloudStorage{
+								BucketUrl: "gs://solo-helm-test/",
+							},
 						},
 					},
 				},
 			},
-		},
-		Config: &v1.BuildRunConfig{
-			BuildEnvVars: &v1.BuildEnvVars{
-				BuildId:       buildId,
-				TaggedVersion: nonReleaseTagValue,
+			Config: &v1.BuildRunConfig{
+				BuildEnvVars: &v1.BuildEnvVars{
+					BuildId:       buildId,
+					TaggedVersion: nonReleaseTagValue,
+				},
+				ComputedBuildVars: &v1.ComputedBuildVars{
+					Release:         false,
+					ImageTag:        buildId,
+					ContainerPrefix: "gcr.io/solo-public-1010",
+					Version:         buildId,
+					HelmRepository:  "gs://solo-helm-test/",
+				},
 			},
-			ComputedBuildVars: &v1.ComputedBuildVars{
-				Release:         false,
-				ImageTag:        buildId,
-				ContainerPrefix: "gcr.io/solo-public-1010",
-				Version:         buildId,
-				HelmRepository:  "gs://solo-helm-test/",
-			},
-		},
-	}
+		}
+	})
 
 	Context("InitializeBuildRun", func() {
 		It("should fallback to default filename when no file specified and env var not set", func() {
@@ -221,7 +223,7 @@ var _ = Describe("ingest config", func() {
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
 			Expect(prefix).To(Equal("gcr.io/aproject"))
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = ""
-			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
+			Expect(setContainerPrefix(&prefix, release, config)).NotTo(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.BaseUrl = "gcr.io"
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Gcr).Gcr.ProjectId = ""
@@ -246,7 +248,7 @@ var _ = Describe("ingest config", func() {
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
 			Expect(prefix).To(Equal("quay.io/an-org"))
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Quay).Quay.BaseUrl = ""
-			Expect(setContainerPrefix(&prefix, release, config)).To(HaveOccurred())
+			Expect(setContainerPrefix(&prefix, release, config)).NotTo(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Quay).Quay.BaseUrl = "quay.io"
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
 			config.ReleaseContainerRegistry.Registry.(*v1.ContainerRegistry_Quay).Quay.Organization = ""
@@ -260,13 +262,15 @@ var _ = Describe("ingest config", func() {
 			config := &v1.BuildConfig{
 				ReleaseContainerRegistry: &v1.ContainerRegistry{
 					Registry: &v1.ContainerRegistry_DockerHub{
-						DockerHub: &v1.DockerHubRegistry{},
+						DockerHub: &v1.DockerHubRegistry{
+							Organization: "an-org",
+						},
 					},
 				},
 				TestContainerRegistry: nil,
 			}
 			Expect(setContainerPrefix(&prefix, release, config)).ToNot(HaveOccurred())
-			Expect(prefix).To(Equal("docker.io"))
+			Expect(prefix).To(Equal("docker.io/an-org"))
 		})
 	})
 })
