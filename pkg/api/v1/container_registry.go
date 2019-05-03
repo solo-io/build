@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 )
 
 func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error {
@@ -17,31 +18,50 @@ func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error
 	}
 }
 
-const dockerRepoUrl = "docker.io"
+var (
+	NoDockerOrgSpecifiedError = errors.Errorf("must provide an organization for docker repos")
+	NoQuayOrgSpecifiedError = errors.Errorf("must provide an organization for quay repos")
+	NoGcrProjectIdSpecifiedError = errors.Errorf("must provide a project id for gcr repos")
+)
+
+const (
+	DockerBaseUrl = "docker.io"
+	QuayBaseUrl = "quay.io"
+	GcrBaseUrl = "gcr.io"
+)
 
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {
-	*prefix = dockerRepoUrl
+	base, org := x.DockerHub.GetBaseUrl(), x.DockerHub.GetOrganization()
+	if base == "" {
+		base = DockerBaseUrl
+	}
+	if org == "" {
+		return NoDockerOrgSpecifiedError
+	}
+	*prefix = fmt.Sprintf("%s/%s", base, org)
 	return nil
 }
 
 func (x *ContainerRegistry_Quay) setRepoPrefix(prefix *string) error {
-	if x.Quay.BaseUrl == "" {
-		return fmt.Errorf("must provide a base url for quay repos")
+	base, org := x.Quay.GetBaseUrl(), x.Quay.GetOrganization()
+	if base == "" {
+		base = QuayBaseUrl
 	}
-	if x.Quay.Organization == "" {
-		return fmt.Errorf("must provide an organization for quay repos")
+	if org == "" {
+		return NoQuayOrgSpecifiedError
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.Quay.BaseUrl, x.Quay.Organization)
+	*prefix = fmt.Sprintf("%s/%s", base, org)
 	return nil
 }
 
 func (x *ContainerRegistry_Gcr) setRepoPrefix(prefix *string) error {
-	if x.Gcr.BaseUrl == "" {
-		return fmt.Errorf("must provide a base url for gcr repos")
+	base, proj := x.Gcr.GetBaseUrl(), x.Gcr.GetProjectId()
+	if base == "" {
+		base = GcrBaseUrl
 	}
-	if x.Gcr.ProjectId == "" {
-		return fmt.Errorf("must provide a project name for gcr repos")
+	if proj == "" {
+		return NoGcrProjectIdSpecifiedError
 	}
-	*prefix = fmt.Sprintf("%s/%s", x.Gcr.BaseUrl, x.Gcr.ProjectId)
+	*prefix = fmt.Sprintf("%s/%s", base, proj)
 	return nil
 }
