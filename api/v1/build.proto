@@ -35,14 +35,15 @@ message ComputedBuildVars {
     string helm_repository = 5;
 }
 
-//message GcloudConfig {
-//    string project_id = 4;
+message GcloudConfig {
+    // project_id for repo for all gcloud interactions
+    string project_id = 4;
 //    string decrypt_key = 5;
 //    string decrypt_keyring = 6;
-//
-//    // optional location to put helm charts
+
+    // optional location to put helm charts
 //    string helm_chart_bucket = 7;
-//}
+}
 
 // This gets checked into project repo
 message BuildSpec {
@@ -94,9 +95,9 @@ message BuildConfig {
 //    string output_directory = 3;
 //    string version_var = 4;
 
-//    oneof ci_config {
-//        GcloudConfig gcloud = 10;
-//    }
+    oneof ci_config {
+        GcloudConfig gcloud = 10;
+    }
 
     ContainerRegistry release_container_registry = 20;
     // optional, if not provided, will use the same registry for release and test
