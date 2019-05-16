@@ -1,13 +1,14 @@
-config:
-  release_container_registry:
-    quay:
-      organization: solo-io
-  test_container_registry:
-    gcr:
-      project_id: solo-public-1010
-  release_helm_repository:
-    google_cloud_storage:
-      bucket_url: gs://solo-helm/
-  test_helm_repository:
-    google_cloud_storage:
-      bucket_url: gs://solo-helm-test/
+releaseContainerRegistry:
+  quay:
+    organization: solo-io
+testContainerRegistry:
+  gcr:
+    projectId: solo-public-1010
+releaseHelmRepository:
+  googleCloudStorage:
+    bucketUrl: gs://solo-helm/
+testHelmRepository:
+  googleCloudStorage:
+    bucketUrl: gs://solo-helm-test/
+gcloud:
+  projectId: solo-public

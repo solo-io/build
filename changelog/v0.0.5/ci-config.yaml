@@ -1,0 +1,7 @@
+changelog:
+- type: NEW_FEATURE
+  description: Enabled ci-config to be used by solobot
+  issueLink: https://github.com/solo-io/build/issues/14
+- type: FIX
+  description: Removed top level config key/value pair from solo-project.yaml as it is redundant.
+  issueLink: https://github.com/solo-io/build/issues/14

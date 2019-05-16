@@ -17,22 +17,24 @@ import (
 )
 
 func InitializeBuildRun(configFilename string, explicitBuildEnvVars *v1.BuildEnvVars) (v1.BuildRun, error) {
-	buildSpec, err := parseSpec(configFilename)
+	buildConfig, err := parseSpec(configFilename)
 	if err != nil {
 		return v1.BuildRun{}, err
 	}
-	buildRunConfig, err := getBuildRunConfig(buildSpec, explicitBuildEnvVars)
+	buildRunConfig, err := getBuildRunConfig(buildConfig, explicitBuildEnvVars)
 	if err != nil {
 		return v1.BuildRun{}, err
 	}
 	return v1.BuildRun{
-		Spec:   buildSpec,
+		Spec:   &v1.BuildSpec{
+			Config: buildConfig,
+		},
 		Config: &buildRunConfig,
 	}, nil
 }
 
 // uses a config filename from env or default, in that order
-func parseSpec(filename string) (*v1.BuildSpec, error) {
+func parseSpec(filename string) (*v1.BuildConfig, error) {
 	if filename == "" {
 		contextutils.LoggerFrom(context.TODO()).Debugw("project filename not provided, checking env")
 		envFile := os.Getenv(constants.EnvVarConfigFileName)
@@ -44,7 +46,7 @@ func parseSpec(filename string) (*v1.BuildSpec, error) {
 		}
 	}
 	b, err := ioutil.ReadFile(filename)
-	spec := &v1.BuildSpec{}
+	spec := &v1.BuildConfig{}
 	if err != nil {
 		return spec, errors.Wrapf(err, "could not parse build spec")
 	}
@@ -54,7 +56,7 @@ func parseSpec(filename string) (*v1.BuildSpec, error) {
 	return spec, nil
 }
 
-func getBuildRunConfig(spec *v1.BuildSpec, explicitBuildEnvVars *v1.BuildEnvVars) (v1.BuildRunConfig, error) {
+func getBuildRunConfig(config *v1.BuildConfig, explicitBuildEnvVars *v1.BuildEnvVars) (v1.BuildRunConfig, error) {
 	ev := resolveBuildEnvVars(explicitBuildEnvVars)
 	cv := &v1.ComputedBuildVars{}
 	cv.Release = isRelease(ev)
@@ -66,10 +68,10 @@ func getBuildRunConfig(spec *v1.BuildSpec, explicitBuildEnvVars *v1.BuildEnvVars
 	if err := setImageTag(&cv.ImageTag, ev); err != nil {
 		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set image tag")
 	}
-	if err := setContainerPrefix(&cv.ContainerPrefix, cv.Release, spec.Config); err != nil {
+	if err := setContainerPrefix(&cv.ContainerPrefix, cv.Release, config); err != nil {
 		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set container prefix")
 	}
-	if err := setHelmRepository(&cv.HelmRepository, cv.Release, spec.Config); err != nil {
+	if err := setHelmRepository(&cv.HelmRepository, cv.Release, config); err != nil {
 		return v1.BuildRunConfig{}, errors.Wrapf(err, "could not set helm chart repository")
 	}
 	return v1.BuildRunConfig{
