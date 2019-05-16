@@ -50,6 +50,11 @@ var _ = Describe("ingest config", func() {
 							},
 						},
 					},
+					CiConfig: &v1.BuildConfig_Gcloud{
+						Gcloud: &v1.GcloudConfig{
+							ProjectId: "solo-public",
+						},
+					},
 				},
 			},
 			Config: &v1.BuildRunConfig{
