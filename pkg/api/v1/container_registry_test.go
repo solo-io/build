@@ -52,7 +52,7 @@ var _ = Describe("container registry", func() {
 			cr := ContainerRegistry{
 				Registry: &ContainerRegistry_DockerHub{
 					DockerHub: &DockerHubRegistry{
-						BaseUrl: "other.docker.io",
+						BaseUrl:      "other.docker.io",
 						Organization: orgName,
 					},
 				},
@@ -61,8 +61,6 @@ var _ = Describe("container registry", func() {
 			Expect(prefix).To(Equal("other.docker.io/myorg"))
 		})
 	})
-
-
 
 	Context("quay", func() {
 
@@ -79,8 +77,7 @@ var _ = Describe("container registry", func() {
 		It("should error if orgName not specified", func() {
 			cr := ContainerRegistry{
 				Registry: &ContainerRegistry_Quay{
-					Quay: &QuayRegistry{
-					},
+					Quay: &QuayRegistry{},
 				},
 			}
 			err := cr.SetPrefixFromContainerRegistry(&prefix)
@@ -128,8 +125,7 @@ var _ = Describe("container registry", func() {
 		It("should error if projectId not specified", func() {
 			cr := ContainerRegistry{
 				Registry: &ContainerRegistry_Gcr{
-					Gcr: &GoogleContainerRegistry{
-					},
+					Gcr: &GoogleContainerRegistry{},
 				},
 			}
 			err := cr.SetPrefixFromContainerRegistry(&prefix)
@@ -161,8 +157,5 @@ var _ = Describe("container registry", func() {
 			Expect(prefix).To(Equal("other.gcr.io/myproject"))
 		})
 	})
-
-
-
 
 })

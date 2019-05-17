@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -19,15 +20,15 @@ func (r *ContainerRegistry) SetPrefixFromContainerRegistry(prefix *string) error
 }
 
 var (
-	NoDockerOrgSpecifiedError = errors.Errorf("must provide an organization for docker repos")
-	NoQuayOrgSpecifiedError = errors.Errorf("must provide an organization for quay repos")
+	NoDockerOrgSpecifiedError    = errors.Errorf("must provide an organization for docker repos")
+	NoQuayOrgSpecifiedError      = errors.Errorf("must provide an organization for quay repos")
 	NoGcrProjectIdSpecifiedError = errors.Errorf("must provide a project id for gcr repos")
 )
 
 const (
 	DockerBaseUrl = "docker.io"
-	QuayBaseUrl = "quay.io"
-	GcrBaseUrl = "gcr.io"
+	QuayBaseUrl   = "quay.io"
+	GcrBaseUrl    = "gcr.io"
 )
 
 func (x *ContainerRegistry_DockerHub) setRepoPrefix(prefix *string) error {

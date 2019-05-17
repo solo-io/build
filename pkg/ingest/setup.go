@@ -26,7 +26,7 @@ func InitializeBuildRun(configFilename string, explicitBuildEnvVars *v1.BuildEnv
 		return v1.BuildRun{}, err
 	}
 	return v1.BuildRun{
-		Spec:   &v1.BuildSpec{
+		Spec: &v1.BuildSpec{
 			Config: buildConfig,
 		},
 		Config: &buildRunConfig,
