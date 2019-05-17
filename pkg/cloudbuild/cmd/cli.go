@@ -23,6 +23,11 @@ func main() {
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Fatalw("Error parsing config", zap.Error(err))
 	}
+	printCloudbuildYaml(ctx, spec)
+	printCloudbuildCacheYaml(ctx, spec)
+}
+
+func printCloudbuildYaml(ctx context.Context, spec *v1.BuildSpec) {
 	build, err := cloudbuild.GenerateCloudbuild(spec)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Fatalw("Error converting to cloudbuild", zap.Error(err))
@@ -31,7 +36,23 @@ func main() {
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Fatalw("Error marshalling to yaml", zap.Error(err))
 	}
-	fmt.Printf(cloudbuildYaml)
+	fmt.Printf("cloudbuild.yaml:\n")
+	fmt.Printf("----------------\n")
+	fmt.Printf(cloudbuildYaml + "\n")
+}
+
+func printCloudbuildCacheYaml(ctx context.Context, spec *v1.BuildSpec) {
+	build, err := cloudbuild.GenerateCloudbuildCache(spec)
+	if err != nil {
+		contextutils.LoggerFrom(ctx).Fatalw("Error converting to cloudbuild", zap.Error(err))
+	}
+	cloudbuildYaml, err := GetCloudbuildString(build)
+	if err != nil {
+		contextutils.LoggerFrom(ctx).Fatalw("Error marshalling to yaml", zap.Error(err))
+	}
+	fmt.Printf("cloudbuild.yaml:\n")
+	fmt.Printf("----------------\n")
+	fmt.Printf(cloudbuildYaml + "\n")
 }
 
 func ReadBuildSpec(bytes []byte) (*v1.BuildSpec, error) {

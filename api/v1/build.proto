@@ -42,13 +42,18 @@ message GcloudConfig {
     string decrypt_keyring = 6;
     map<string,string> encrypted_secrets = 7;
     string timeout = 8;
-    string go_cache = 9;
+    // A location that can be referenced with gsutil, i.e. gsutil cat gs://%go_cache
+    GoCache go_cache = 9;
 
 
     // optional location to put helm charts
 //    string helm_chart_bucket = 7;
 }
 
+message GoCache {
+    string bucket = 1;
+    string name = 2;
+}
 
 // This gets checked into project repo
 message BuildSpec {
