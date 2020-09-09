@@ -3,3 +3,7 @@ changelog:
     dependencyOwner: solo-io
     dependencyRepo: go-utils
     dependencyTag: v0.17.0
+  - type: NON_USER_FACING
+    description: Modernize ci build to use GitHub actions instead of Google Cloud.
+    issueLink: https://github.com/solo-io/build-bot/issues/73
+    resolvesIssue: false

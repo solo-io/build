@@ -1,4 +1,9 @@
 steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['version']
+  id: 'empty noop to pass CI'
+
+steps:
   - name: gcr.io/cloud-builders/gcloud
     args: ['config', 'set', 'compute/zone', 'us-central1-a']
   - name: gcr.io/cloud-builders/gcloud
