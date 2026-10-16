@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - name: Cancel Previous Runs
       uses: styfle/cancel-workflow-action@ee9e0f86fb1a4d7029390154477333bf53e41c5e # 0.4.0
@@ -19,10 +19,10 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up Go 1.14
-      uses: actions/setup-go@0caeaed6fd66a828038c2da3c0f662a42862658f # v1.1.3
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
       with:
         go-version: 1.14
-    - uses: actions/cache@f5ce41475b483ad7581884324a6eca9f48f8dcc7 # v1.2.1
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
