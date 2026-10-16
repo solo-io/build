@@ -9,29 +9,29 @@ on:
 jobs:
   test:
     name: Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.4.0
+      uses: styfle/cancel-workflow-action@ee9e0f86fb1a4d7029390154477333bf53e41c5e # 0.4.0
       with:
         access_token: ${{ github.token }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
       with:
         fetch-depth: 0
     - name: Set up Go 1.14
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
       with:
         go-version: 1.14
-    - uses: actions/cache@v1
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go
-    - uses: azure/setup-kubectl@v1
+    - uses: azure/setup-kubectl@a625ca209b0faaa8871dac8fb5f50ee4b4d22622 # v1
       with:
         version: 'v1.18.0'
-    - uses: engineerd/setup-kind@v0.3.0
+    - uses: engineerd/setup-kind@d0e9be1a527c343e9f48768138359d8253e526c0 # v0.3.0
     - name: Build
       run: |
           go build ./...
